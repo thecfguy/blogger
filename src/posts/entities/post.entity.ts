@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Comment } from '../comments/entities/comment.entity';
 
-@Entity()
+@Entity({ name: 'posts' })
 export class Post {
   @PrimaryGeneratedColumn()
   id: number;

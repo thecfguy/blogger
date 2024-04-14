@@ -1,0 +1,31 @@
+
+GET http://localhost:3000/posts
+
+###
+GET http://localhost:3000/posts/1
+
+
+###
+POST http://localhost:3000/posts
+Content-Type: application/json
+
+{
+  "title": "Exploring the Beauty of Nature",
+  "body": "Today, I took a long walk through the forest and marveled at the lush greenery and tranquil streams. Nature never fails to amaze me.",
+  "user": {
+    "id": 1
+  }
+}
+
+###
+
+PATCH http://localhost:3000/posts/1
+Content-Type: application/json
+
+{
+  "title": "Exploring the Beauty of Nature 2",
+  "body": "Today, I took a long walk through the forest and marveled at the lush greenery and tranquil streams. Nature never fails to amaze me."
+}
+
+###
+DELETE http://localhost:3000/posts/32
