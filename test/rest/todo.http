@@ -1,0 +1,37 @@
+
+GET http://localhost:3000/todos
+
+###
+GET http://localhost:3000/todos/1
+
+
+###
+POST http://localhost:3000/todos
+Content-Type: application/json
+
+{
+    "title": "delectus aut autem",
+    "completed": false,
+    "user": {
+        "id": 1,
+        "name": "John Doe",
+        "username": "Bret",
+        "email": "john.doe@gmail.com"
+    }
+}
+
+###
+
+PATCH http://localhost:3000/todos/1
+Content-Type: application/json
+
+{
+    "title": "delectus aut autem",
+    "completed": true,
+    "user": {
+        "id": 1
+    }
+}
+
+###
+DELETE http://localhost:3000/todos/61

@@ -1,26 +1,60 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTodoDto } from './dto/create-todo.dto';
+import { TodoDto } from './dto/todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
-
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Todo } from './entities/todo.entity';
 @Injectable()
 export class TodosService {
-  create(createTodoDto: CreateTodoDto) {
-    return 'This action adds a new todo';
+  constructor(@InjectRepository(Todo) private repo: Repository<Todo>) {}
+
+  create(createTodoDto: TodoDto) {
+    const todo = this.repo.create(createTodoDto);
+    return this.repo.save(todo);
   }
 
   findAll() {
-    return `This action returns all todos`;
+    return this.repo.find({
+      relations: ['user'],
+      select: {
+        id: true,
+        title: true,
+        completed: true,
+        user: {
+          id: true,
+          name: true,
+          email: true,
+          username: true,
+        },
+      },
+    });
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} todo`;
+    return this.repo.findOne({
+      where: { id },
+      relations: ['user'],
+      select: {
+        id: true,
+        title: true,
+        completed: true,
+        user: {
+          id: true,
+          name: true,
+          email: true,
+          username: true,
+        },
+      },
+    });
   }
 
-  update(id: number, updateTodoDto: UpdateTodoDto) {
-    return `This action updates a #${id} todo`;
+  async update(id: number, updateTodoDto: UpdateTodoDto) {
+    const todo = this.repo.create(updateTodoDto);
+    await this.repo.save(todo);
+    return this.findOne(id);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} todo`;
+    return this.repo.delete({ id });
   }
 }
