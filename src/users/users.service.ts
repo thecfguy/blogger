@@ -38,6 +38,7 @@ export class UsersService {
     createUserDto.name = user.name;
     createUserDto.username = user.username;
     createUserDto.email = user.email;
+    createUserDto.password = user.password;
     createUserDto.address = {
       street: user.street,
       suite: user.suite,
@@ -63,8 +64,10 @@ export class UsersService {
     return this.mapUserEntityToDto(await this.repo.save(user)) as UserDto;
   }
 
-  async findAll(): Promise<UserDto[]> {
-    const users = await this.repo.find();
+  async findAll(filter?: unknown | null): Promise<UserDto[]> {
+    const users = await this.repo.find({
+      where: filter,
+    });
     return users.map((user) => this.mapUserEntityToDto(user));
   }
 

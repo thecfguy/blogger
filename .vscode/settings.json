@@ -1,6 +1,13 @@
 {
-  "cSpell.words": [
-    "Fastify",
-    "Todos"
-  ]
+  "cSpell.words": ["Fastify", "Todos"],
+  "rest-client.environmentVariables": {
+    "$shared": {
+      "host": "http://localhost:3000",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJyZXQiLCJpYXQiOjE3MTMwODczNDEsImV4cCI6MTcxMzA5MDk0MX0.QSvbknGj57c6z3SrYIH7KJt_i-3dDqIjTkv7XMTiKR8"
+    },
+    "local": {
+      "host": "http://localhost:3000",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJyZXQiLCJpYXQiOjE3MTMwODczNDEsImV4cCI6MTcxMzA5MDk0MX0.QSvbknGj57c6z3SrYIH7KJt_i-3dDqIjTkv7XMTiKR8"
+    }
+  }
 }

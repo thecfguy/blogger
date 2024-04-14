@@ -1,12 +1,14 @@
-GET http://localhost:3000/users
-
+###
+GET {{host}}/users
+Authorization: Bearer {{token}}
 ###
 GET http://localhost:3000/users/1
-
+Authorization: Bearer {{token}}
 
 ###
 POST http://localhost:3000/users
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "name": "John Doe",
@@ -35,11 +37,13 @@ Content-Type: application/json
 
 PATCH http://localhost:3000/users/1
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "id": 1,
   "name": "John Doe",
   "username": "Bret",
+  "password": "bret",
   "email": "john.doe@gmail.com",
   "phone": "1-770-736-8031 x56442",
   "website": "hildegard.org",
@@ -52,3 +56,4 @@ Content-Type: application/json
 
 ###
 DELETE http://localhost:3000/users/11
+Authorization: Bearer {{token}}

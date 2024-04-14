@@ -8,12 +8,15 @@ import {
   Delete,
   ClassSerializerInterceptor,
   UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserDto } from './dto/user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 
 @Controller('users')
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
