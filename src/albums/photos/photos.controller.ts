@@ -1,34 +1,46 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { PhotosService } from './photos.service';
-import { CreatePhotoDto } from './dto/create-photo.dto';
+import { PhotoDto } from './dto/photo.dto';
 import { UpdatePhotoDto } from './dto/update-photo.dto';
 
-@Controller('photos')
+@Controller('albums/:albumId/photos')
 export class PhotosController {
   constructor(private readonly photosService: PhotosService) {}
 
   @Post()
-  create(@Body() createPhotoDto: CreatePhotoDto) {
+  create(@Param('albumId') albumId: string, @Body() createPhotoDto: PhotoDto) {
     return this.photosService.create(createPhotoDto);
   }
 
   @Get()
-  findAll() {
-    return this.photosService.findAll();
+  findAll(@Param('albumId') albumId: string) {
+    return this.photosService.findAll({ albumId });
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.photosService.findOne(+id);
+  findOne(@Param('albumId') albumId: string, @Param('id') id: string) {
+    return this.photosService.findOne(+albumId, +id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePhotoDto: UpdatePhotoDto) {
-    return this.photosService.update(+id, updatePhotoDto);
+  update(
+    @Param('albumId') albumId: string,
+    @Param('id') id: string,
+    @Body() updatePhotoDto: UpdatePhotoDto,
+  ) {
+    return this.photosService.update(albumId, +id, updatePhotoDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('albumId') albumId: string, @Param('id') id: string) {
     return this.photosService.remove(+id);
   }
 }

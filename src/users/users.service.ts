@@ -1,26 +1,92 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { UserDto } from './dto/user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(@InjectRepository(User) private repo: Repository<User>) {}
+
+  mapUserDtoToEntity(createUserDto: UserDto): User {
+    const user = new User();
+    user.id = createUserDto.id;
+    user.name = createUserDto.name;
+    user.username = createUserDto.username;
+    user.email = createUserDto.email;
+    if (createUserDto.address) {
+      user.street = createUserDto.address.street;
+      user.suite = createUserDto.address.suite;
+      user.city = createUserDto.address.city;
+      user.zipcode = createUserDto.address.zipcode;
+      user.lat = createUserDto.address.geo.lat;
+      user.lng = createUserDto.address.geo.lng;
+    }
+    user.phone = createUserDto.phone;
+    user.website = createUserDto.website;
+    if (createUserDto.company) {
+      user.companyName = createUserDto.company.name;
+      user.companyCatchPhrase = createUserDto.company.catchPhrase;
+      user.companyBs = createUserDto.company.bs;
+    }
+    return user;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  mapUserEntityToDto(user: User): UserDto {
+    const createUserDto = new UserDto();
+    createUserDto.id = user.id;
+    createUserDto.name = user.name;
+    createUserDto.username = user.username;
+    createUserDto.email = user.email;
+    createUserDto.address = {
+      street: user.street,
+      suite: user.suite,
+      city: user.city,
+      zipcode: user.zipcode,
+      geo: {
+        lat: user.lat,
+        lng: user.lng,
+      },
+    };
+    createUserDto.phone = user.phone;
+    createUserDto.website = user.website;
+    createUserDto.company = {
+      name: user.companyName,
+      catchPhrase: user.companyCatchPhrase,
+      bs: user.companyBs,
+    };
+    return createUserDto;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async create(createUserDto: UserDto): Promise<UserDto> {
+    const user = this.repo.create(this.mapUserDtoToEntity(createUserDto));
+    return this.mapUserEntityToDto(await this.repo.save(user)) as UserDto;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async findAll(): Promise<UserDto[]> {
+    const users = await this.repo.find();
+    return users.map((user) => this.mapUserEntityToDto(user));
+  }
+
+  async findOne(id: number): Promise<UserDto> {
+    return this.mapUserEntityToDto(
+      await this.repo.findOneBy({ id }),
+    ) as UserDto;
+  }
+
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<UserDto> {
+    const user = await this.repo.findOneBy({ id });
+    if (!user) {
+      return null;
+    }
+    Object.assign(user, updateUserDto);
+
+    return this.mapUserEntityToDto(
+      await this.repo.save(user, { reload: true }),
+    );
   }
 
   remove(id: number) {
-    return `This action removes a #${id} user`;
+    return this.repo.delete(id);
   }
 }

@@ -1,0 +1,34 @@
+
+GET http://localhost:3000/albums/1/photos
+
+###
+GET http://localhost:3000/albums/1/photos/1
+
+
+###
+POST http://localhost:3000/albums/1/photos
+Content-Type: application/json
+
+{
+  "title": "Majestic Cat",
+  "url": "https://www.publicdomainpictures.net/pictures/320000/nahled/cat-posing-for-a-picture-1573334436bGC.jpg",
+  "thumbnailUrl": "https://www.publicdomainpictures.net/pictures/320000/nahled/cat-posing-for-a-picture-1573334436bGC.jpg",
+  "album": {
+    "id": 1,
+    "title": "Summer Memories2"
+  }
+}
+
+###
+
+PATCH http://localhost:3000/albums/1/photos/1
+Content-Type: application/json
+
+{
+  "title": "Majestic Cat",
+  "url": "https://www.publicdomainpictures.net/pictures/320000/nahled/cat-posing-for-a-picture-1573334436bGC.jpg",
+  "thumbnailUrl": "https://www.publicdomainpictures.net/pictures/320000/nahled/cat-posing-for-a-picture-1573334436bGC.jpg"
+}
+
+###
+DELETE http://localhost:3000/albums/1/photos/41

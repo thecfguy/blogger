@@ -9,7 +9,7 @@ import {
 import { Photo } from '@app/albums/photos/entities/photo.entity';
 import { User } from '@app/users/entities/user.entity';
 
-@Entity()
+@Entity({ name: 'albums' })
 export class Album {
   @PrimaryGeneratedColumn()
   id: number;

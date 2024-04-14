@@ -3,18 +3,21 @@ import { Post } from '@app/posts/entities/post.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Album } from '@app/albums/entities/album.entity';
 
-@Entity()
+@Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: false })
   name: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: false })
+  password: string;
+
+  @Column({ nullable: false })
   username: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: false })
   email: string;
 
   @Column({ nullable: true })
