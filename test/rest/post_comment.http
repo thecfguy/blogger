@@ -1,0 +1,29 @@
+
+GET http://localhost:3000/posts/1/comments
+
+###
+GET http://localhost:3000/posts/1/comments/1
+
+
+###
+POST http://localhost:3000/posts/1/comments
+Content-Type: application/json
+
+{
+    "body": "Great post! I completely agree with your thoughts on exploring nature. There's something truly magical about it.",
+    "post": {
+      "id": 1
+    }
+  }
+
+###
+
+PATCH http://localhost:3000/posts/1/comments/1
+Content-Type: application/json
+
+{
+    "body": "Great post! I completely agree with your thoughts on exploring nature. There's something truly magical about it."
+  }
+
+###
+DELETE http://localhost:3000/posts/1/comments/91

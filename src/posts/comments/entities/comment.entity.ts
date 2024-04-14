@@ -1,18 +1,18 @@
 import { Post } from '@app/posts/entities/post.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'comments' })
 export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
+  @Column()
   name: string;
 
-  @Column({ nullable: false })
+  @Column()
   email: string;
 
-  @Column({ nullable: false })
+  @Column()
   body: string;
 
   @ManyToOne(() => Post, (post) => post.comments)
