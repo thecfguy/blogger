@@ -10,17 +10,29 @@ import {
 import { CommentsService } from './comments.service';
 import { CommentDto } from './dto/comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { ParseIntPipe } from '@nestjs/common';
+import { PostsService } from '../posts.service';
+import { NotFoundException } from '@nestjs/common';
+import { PostDto } from '../dto/post.dto';
 
 @Controller('posts/:postId/comments')
 export class CommentsController {
-  constructor(private readonly commentsService: CommentsService) {}
+  constructor(
+    private readonly commentsService: CommentsService,
+    private readonly postsService: PostsService,
+  ) {}
 
   @Post()
-  create(
-    @Param('postId') postId: string,
+  async create(
+    @Param('postId', ParseIntPipe) postId: number,
     @Body() createCommentDto: CommentDto,
   ) {
-    return this.commentsService.create(+postId, createCommentDto);
+    const post = await this.postsService.findOne(postId);
+    if (!post) throw new NotFoundException('Post not found');
+    return this.commentsService.create({
+      ...createCommentDto,
+      post: { id: postId } as PostDto,
+    });
   }
 
   @Get()
@@ -34,13 +46,22 @@ export class CommentsController {
   }
 
   @Patch(':id')
-  update(
-    @Param('postId') postId: string,
-    @Param('id') id: string,
+  async update(
+    @Param('postId', ParseIntPipe) postId: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateCommentDto: UpdateCommentDto,
   ) {
-    return this.commentsService.update(+postId, +id, updateCommentDto);
+    // check if the comment is belongs with the post
+    const postComment = await this.commentsService.findOne(postId, id);
+    // Error: comment not found
+    if (!postComment) throw new NotFoundException('Comment not found');
+
+    // update the comment
+    await this.commentsService.update(id, updateCommentDto);
+
+    return updateCommentDto;
   }
+
   @Delete(':id')
   remove(@Param('postId') postId: string, @Param('id') id: string) {
     return this.commentsService.remove(+postId, +id);
