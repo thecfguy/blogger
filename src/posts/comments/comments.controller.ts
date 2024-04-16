@@ -34,7 +34,7 @@ export class CommentsController {
     if (!findPost) {
       throw new NotFoundException('Record not Found');
     }
-    console.log('findPost', findPost);
+    
     const comment = await this.commentsService.create(
       findPost,
       createCommentDto,
@@ -58,8 +58,8 @@ export class CommentsController {
   }
 
   @Get(':id')
-  async findOne(@Param('postId') postId: string, @Param('id') id: string) {
-    const findComment = await this.commentsService.findOne(+postId, +id);
+  async findOne(@Param('postId', ParseIntPipe) postId: number, @Param('id', ParseIntPipe) id: number,) {
+    const findComment = await this.commentsService.findOne({id, post: {id: postId}});
     if (!findComment) {
       throw new NotFoundException('Record not found');
     }
@@ -72,18 +72,21 @@ export class CommentsController {
     @Param('postId', ParseIntPipe) postId: number,
     @Body() updateCommentDto: UpdateCommentDto,
   ) {
-    const findPost = await this.commentsService.findOne(postId, id);
+    const postComment = await this.commentsService.findOne({id, post: {id: postId}});
 
-    if (!findPost) {
+    if (!postComment) {
       throw new NotFoundException('Record not found');
     }
-    console.log('findPost', findPost);
+   
     const updateData = await this.commentsService.update(id, updateCommentDto);
 
     return { data: updateData, message: 'Record Updated Succesfully' };
   }
-  @Delete(':id')
-  remove(@Param('postId') postId: string, @Param('id') id: string) {
-    return this.commentsService.remove(+postId, +id);
+  async remove(@Param('postId',ParseIntPipe) postId: number, @Param('id',ParseIntPipe) id: number) {
+    // check if the comment is belongs with the post
+    const postComment = await this.commentsService.findOne({id, post: {id: postId}});
+    // Error: comment not found
+    if (!postComment) throw new NotFoundException('Comment not found');
+    return this.commentsService.remove(id);
   }
 }
