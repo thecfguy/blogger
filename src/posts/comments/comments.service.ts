@@ -13,11 +13,9 @@ export class CommentsService {
     @InjectRepository(Post) private postRepo: Repository<Post>,
   ) {}
 
-  async create(postId: number, createCommentDto: CommentDto) {
-    createCommentDto.post.id = postId;
-    this.repo.create(createCommentDto);
-    const comment = await this.repo.save(createCommentDto);
-    return this.findOne(postId, comment.id);
+  async create(createCommentDto: CommentDto) {
+    const comment = await this.repo.create(createCommentDto);
+    return await this.repo.save(comment);    
   }
 
   findAll(filter: any) {
@@ -37,9 +35,9 @@ export class CommentsService {
     });
   }
 
-  findOne(postId: number, id: number) {
-    return this.repo.find({
-      where: { id, post: this.postRepo.create({ id: postId }) },
+  async findOne(postId: number, id: number) {
+    return await this.repo.findOne({
+      where: { id, post: { id: postId } },
       relations: ['post'],
       select: {
         id: true,
@@ -54,13 +52,8 @@ export class CommentsService {
     });
   }
 
-  async update(postId: number, id: number, updateCommentDto: UpdateCommentDto) {
-    if (updateCommentDto['post'] === undefined)
-      updateCommentDto['post'] = { id: postId } as PostDto;
-    else updateCommentDto['post']['id'] = postId;
-    const comment = this.repo.create(updateCommentDto);
-    await this.repo.update(id, comment);
-    return this.findOne(postId, id);
+  async update(id: number, updateCommentDto: UpdateCommentDto) {
+    return await this.repo.update(id, updateCommentDto);
   }
 
   remove(postId: number, id: number) {
