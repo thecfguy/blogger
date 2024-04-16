@@ -36,13 +36,13 @@ export class CommentsController {
   }
 
   @Get()
-  findAll(@Param('postId') postId: string) {
-    return this.commentsService.findAll({ postId: +postId });
+  findAll(@Param('postId', ParseIntPipe) postId: number) {
+    return this.commentsService.findAll({ post: {id: postId} });
   }
 
   @Get(':id')
-  findOne(@Param('postId') postId: string, @Param('id') id: string) {
-    return this.commentsService.findOne(+postId, +id);
+  findOne(@Param('postId',ParseIntPipe) postId: number, @Param('id',ParseIntPipe) id: number) {
+    return this.commentsService.findOne({ id, post: {id: postId} });
   }
 
   @Patch(':id')
@@ -52,7 +52,7 @@ export class CommentsController {
     @Body() updateCommentDto: UpdateCommentDto,
   ) {
     // check if the comment is belongs with the post
-    const postComment = await this.commentsService.findOne(postId, id);
+    const postComment = await this.commentsService.findOne({id, post: {id: postId}});
     // Error: comment not found
     if (!postComment) throw new NotFoundException('Comment not found');
 
@@ -63,7 +63,11 @@ export class CommentsController {
   }
 
   @Delete(':id')
-  remove(@Param('postId') postId: string, @Param('id') id: string) {
-    return this.commentsService.remove(+postId, +id);
+  remove(@Param('postId',ParseIntPipe) postId: number, @Param('id',ParseIntPipe) id: number) {
+    // check if the comment is belongs with the post
+    const postComment = await this.commentsService.findOne({id, post: {id: postId}});
+    // Error: comment not found
+    if (!postComment) throw new NotFoundException('Comment not found');
+    return this.commentsService.remove(id);
   }
 }

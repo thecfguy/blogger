@@ -4,13 +4,11 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
-import { Post } from '../entities/post.entity';
-import { PostDto } from '../dto/post.dto';
+
 @Injectable()
 export class CommentsService {
   constructor(
-    @InjectRepository(Comment) private repo: Repository<Comment>,
-    @InjectRepository(Post) private postRepo: Repository<Post>,
+    @InjectRepository(Comment) private repo: Repository<Comment>
   ) {}
 
   async create(createCommentDto: CommentDto) {
@@ -18,6 +16,7 @@ export class CommentsService {
     return await this.repo.save(comment);    
   }
 
+  //TODO: Change any with proper interface
   findAll(filter: any) {
     return this.repo.find({
       where: { post: filter.postId },
@@ -35,9 +34,10 @@ export class CommentsService {
     });
   }
 
-  async findOne(postId: number, id: number) {
+  //TODO: Change any with proper interface
+  async findOne(filter:any) {
     return await this.repo.findOne({
-      where: { id, post: { id: postId } },
+      where: filter ,
       relations: ['post'],
       select: {
         id: true,
@@ -56,7 +56,7 @@ export class CommentsService {
     return await this.repo.update(id, updateCommentDto);
   }
 
-  remove(postId: number, id: number) {
-    return this.repo.delete({ id, post: this.postRepo.create({ id: postId }) });
+  remove(id: number) {
+    return this.repo.delete({ id });
   }
 }
