@@ -9,12 +9,13 @@ export class DatabaseService implements TypeOrmOptionsFactory {
     return {
       type: 'mysql',
       host: this.config.get('DB_HOST'),
-      port: 3306 ,
-      username: 'root',
-      password: '#Lalit@321',
-      database: 'blogger',
+      port: this.config.get('DB_PORT'),
+      username: this.config.get('DB_USER'),
+      password: this.config.get('DB_PASS'),
+      database: this.config.get('DB_NAME'),
       autoLoadEntities: true,
       synchronize: false,
+      logging: true,
     };
   }
 }
