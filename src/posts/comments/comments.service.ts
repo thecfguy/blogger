@@ -5,22 +5,28 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
 
+import { User } from '@app/users/entities/user.entity';
 @Injectable()
 export class CommentsService {
   constructor(
-    @InjectRepository(Comment) private repo: Repository<Comment>
+    @InjectRepository(Comment) private repo: Repository<Comment>,
+   
   ) {}
 
-  async create(createCommentDto: CommentDto) {
-    const comment = await this.repo.create(createCommentDto);
-    return await this.repo.save(comment);    
+  async create(post, createCommentDto: CommentDto,user:User) {
+    const comment = this.repo.create({ ...createCommentDto, post });
+    const savedComment = await this.repo.save(comment);
+
+    return savedComment;
   }
 
-  //TODO: Change any with proper interface
-  findAll(filter: any) {
+  findAll(filter: any,page: number, limit: number ) {
+    const skip = (page - 1) * limit;
     return this.repo.find({
       where: { post: filter.postId },
       relations: ['post'],
+      take: limit,
+      skip: skip,
       select: {
         id: true,
         name: true,
@@ -34,10 +40,9 @@ export class CommentsService {
     });
   }
 
-  //TODO: Change any with proper interface
   async findOne(filter:any) {
     return await this.repo.findOne({
-      where: filter ,
+      where: filter,
       relations: ['post'],
       select: {
         id: true,
@@ -53,7 +58,16 @@ export class CommentsService {
   }
 
   async update(id: number, updateCommentDto: UpdateCommentDto) {
-    return await this.repo.update(id, updateCommentDto);
+    
+    const updateComment = await this.repo.update(id, updateCommentDto);
+    console.log('updateComment',updateComment)
+    if (updateComment.affected > 0) {
+      const updatedComment = await this.repo.findOne({where:{
+        id:id
+      }});
+      return updatedComment;
+    } 
+    return updateComment;
   }
 
   remove(id: number) {
