@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
 import { Post } from '../entities/post.entity';
 import { PostDto } from '../dto/post.dto';
+import { User } from '@app/users/entities/user.entity';
 @Injectable()
 export class CommentsService {
   constructor(
@@ -13,17 +14,20 @@ export class CommentsService {
     @InjectRepository(Post) private postRepo: Repository<Post>,
   ) {}
 
-  async create(postId: number, createCommentDto: CommentDto) {
-    createCommentDto.post.id = postId;
-    this.repo.create(createCommentDto);
-    const comment = await this.repo.save(createCommentDto);
-    return this.findOne(postId, comment.id);
+  async create(post, createCommentDto: CommentDto,user:User) {
+    const comment = this.repo.create({ ...createCommentDto, post });
+    const savedComment = await this.repo.save(comment);
+
+    return savedComment;
   }
 
-  findAll(filter: any) {
+  findAll(filter: any,page: number, limit: number ) {
+    const skip = (page - 1) * limit;
     return this.repo.find({
       where: { post: filter.postId },
       relations: ['post'],
+      take: limit,
+      skip: skip,
       select: {
         id: true,
         name: true,
@@ -37,9 +41,9 @@ export class CommentsService {
     });
   }
 
-  findOne(postId: number, id: number) {
-    return this.repo.find({
-      where: { id, post: this.postRepo.create({ id: postId }) },
+  async findOne(postId: number, id: number) {
+    return await this.repo.findOne({
+      where: { id, post: { id: postId } },
       relations: ['post'],
       select: {
         id: true,
@@ -54,13 +58,17 @@ export class CommentsService {
     });
   }
 
-  async update(postId: number, id: number, updateCommentDto: UpdateCommentDto) {
-    if (updateCommentDto['post'] === undefined)
-      updateCommentDto['post'] = { id: postId } as PostDto;
-    else updateCommentDto['post']['id'] = postId;
-    const comment = this.repo.create(updateCommentDto);
-    await this.repo.update(id, comment);
-    return this.findOne(postId, id);
+  async update(id: number, updateCommentDto: UpdateCommentDto) {
+    
+    const updateComment = await this.repo.update(id, updateCommentDto);
+    console.log('updateComment',updateComment)
+    if (updateComment.affected > 0) {
+      const updatedComment = await this.repo.findOne({where:{
+        id:id
+      }});
+      return updatedComment;
+    } 
+    return updateComment;
   }
 
   remove(postId: number, id: number) {

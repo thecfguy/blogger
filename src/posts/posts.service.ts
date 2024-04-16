@@ -13,9 +13,12 @@ export class PostsService {
     return this.repo.save(post);
   }
 
-  findAll() {
+  findAll(page:number, limit:number) {
+    const skip = (page - 1) * limit;
     return this.repo.find({
       relations: ['user'],
+      take: limit,
+      skip: skip,
       select: {
         id: true,
         title: true,
