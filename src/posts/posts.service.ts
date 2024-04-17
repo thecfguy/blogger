@@ -8,8 +8,10 @@ import { Post } from './entities/post.entity';
 export class PostsService {
   constructor(@InjectRepository(Post) private repo: Repository<Post>) {}
 
-  create(createPostDto: PostDto) {
-    const post = this.repo.create(createPostDto);
+  async create(createPostDto: PostDto, user): Promise<Post> {
+    
+    const post =await this.repo.create({...createPostDto, user:user});
+ 
     return this.repo.save(post);
   }
 
@@ -30,8 +32,8 @@ export class PostsService {
     });
   }
 
-  findOne(id: number) {
-    return this.repo.findOne({
+  async findOne(id: number) {
+    return await this.repo.findOne({
       where: { id },
       relations: ['user'],
       select: {
