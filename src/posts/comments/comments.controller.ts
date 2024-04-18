@@ -19,7 +19,7 @@ import { PostDto } from '../dto/post.dto';
 import { GetUser } from '@app/common/decorator/getUser.decorator';
 import { User } from '@app/users/entities/user.entity';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
-
+import { Pagination } from '@app/common/interface/pagination.interface';
 
 //  implement JwtGuard On Controller
 @UseGuards(JwtAuthGuard)
@@ -29,7 +29,7 @@ export class CommentsController {
     private readonly commentsService: CommentsService,
     private readonly postsService: PostsService,
   ) {}
- 
+
   @Post()
   async create(
     @Param('postId', ParseIntPipe) postId: number,
@@ -48,14 +48,13 @@ export class CommentsController {
   @Get()
   async findAll(
     @Param('postId', ParseIntPipe) postId: number,
-    @Query('page', ParseIntPipe) page: number,
-    @Query('limit', ParseIntPipe) limit: number,
+    @Query() paginationDto: Pagination,
   ) {
     const comments = await this.commentsService.findAll(
       {
         post: { id: postId },
       },
-      { page, limit },
+      paginationDto,
     );
     return comments;
   }
@@ -107,5 +106,4 @@ export class CommentsController {
     if (!postComment) throw new NotFoundException('Comment not found');
     return await this.commentsService.remove(id);
   }
-
 }

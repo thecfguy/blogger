@@ -18,7 +18,7 @@ export class CommentsService {
   }
 
   //TODO: Change any with proper interface
-  findAll(filter: CommentFilter, pagination?: Pagination) {
+  findAll(filter: CommentFilter, pagination?: Pagination):Promise<Comment[]> {
     const modifiedFilter: any = { post: filter.post };
 
     if (typeof filter.id === 'number') {
@@ -47,7 +47,7 @@ export class CommentsService {
   }
 
   //TODO: Change any with proper interface
-  async findOne(filter: CommentFilter) {
+  async findOne(filter: CommentFilter):Promise<Comment> {
     const modifiedFilter: any = { post: filter.post };
 
     if (typeof filter.id === 'number') {

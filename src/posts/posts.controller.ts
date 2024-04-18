@@ -31,10 +31,9 @@ export class PostsController {
   }
 
   @Get()
-  async findAll(@Query('page', ParseIntPipe) page?: number,
-  @Query('limit', ParseIntPipe) limit?: number) {
+  async findAll(@Query() paginationDto: Pagination) {
   
-    return await this.postsService.findAll({ page, limit });
+    return await this.postsService.findAll(paginationDto);
   }
 
   @Get(':id')
