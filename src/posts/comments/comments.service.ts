@@ -4,22 +4,21 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
+import { CommentFilterDto } from './dto/filter.dto';
 
 @Injectable()
 export class CommentsService {
-  constructor(
-    @InjectRepository(Comment) private repo: Repository<Comment>
-  ) {}
+  constructor(@InjectRepository(Comment) private repo: Repository<Comment>) {}
 
   async create(createCommentDto: CommentDto) {
     const comment = await this.repo.create(createCommentDto);
-    return await this.repo.save(comment);    
+    return await this.repo.save(comment);
   }
 
   //TODO: Change any with proper interface
-  findAll(filter: any) {
+  findAll(filter: CommentFilterDto) {
     return this.repo.find({
-      where: { post: filter.postId },
+      where: filter, // getting error here...
       relations: ['post'],
       select: {
         id: true,
@@ -35,9 +34,9 @@ export class CommentsService {
   }
 
   //TODO: Change any with proper interface
-  async findOne(filter:any) {
+  async findOne(filter: CommentFilterDto) {
     return await this.repo.findOne({
-      where: filter ,
+      where: filter, // getting error here...
       relations: ['post'],
       select: {
         id: true,

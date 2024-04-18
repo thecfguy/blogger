@@ -4,6 +4,8 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
+import { PostListFilterDto } from './dto/list-post.dto';
+import { PostGetFilterDto } from './dto/get-post.dto';
 @Injectable()
 export class PostsService {
   constructor(@InjectRepository(Post) private repo: Repository<Post>) {}
@@ -13,7 +15,7 @@ export class PostsService {
     return this.repo.save(post);
   }
 
-  findAll() {
+  findAll(filter: PostListFilterDto) {
     return this.repo.find({
       relations: ['user'],
       select: {
@@ -27,12 +29,14 @@ export class PostsService {
           username: true,
         },
       },
+      skip: (filter.pagination.page - 1) * filter.pagination.maxRows,
+      take: filter.pagination.maxRows,
     });
   }
 
-  findOne(id: number) {
+  findOne(filter: PostGetFilterDto) {
     return this.repo.findOne({
-      where: { id },
+      where: filter,
       relations: ['user'],
       select: {
         id: true,
@@ -51,7 +55,7 @@ export class PostsService {
   async update(id: number, updatePostDto: UpdatePostDto) {
     const post = this.repo.create(updatePostDto);
     await this.repo.update(id, post);
-    return this.findOne(id);
+    return this.findOne({ id });
   }
 
   remove(id: number) {

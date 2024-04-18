@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostDto } from './dto/post.dto';
@@ -21,13 +22,13 @@ export class PostsController {
   }
 
   @Get()
-  findAll() {
-    return this.postsService.findAll();
+  findAll(@Query('page') page: number, @Query('maxRows') maxRows: number) {
+    return this.postsService.findAll({ pagination: { page, maxRows } });
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postsService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.postsService.findOne({ id });
   }
 
   @Patch(':id')
