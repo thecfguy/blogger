@@ -8,12 +8,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { PostResponseInterceptor } from './interceptor/postResponse-format.interceptor';
 @Module({
   controllers: [PostsController],
-  providers: [PostsService,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: PostResponseInterceptor,
-    },
-  ],
+  providers: [PostsService],
   imports: [CommentsModule, TypeOrmModule.forFeature([Post])],
 })
 export class PostsModule {}

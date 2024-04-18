@@ -8,10 +8,7 @@ import { PostsService } from '../posts.service';
 import { CommentResponseInterceptor } from './interceptor/commentsResponse-formater.interceptor';
 @Module({
   controllers: [CommentsController],
-  providers: [CommentsService, PostsService,{
-    provide: 'APP_INTERCEPTOR',
-    useClass: CommentResponseInterceptor,
-  }],
+  providers: [CommentsService, PostsService],
   imports: [TypeOrmModule.forFeature([Post, Comment])],
 })
 export class CommentsModule {}
