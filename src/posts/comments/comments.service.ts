@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CommentDto } from './dto/comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
-import { CommentFilterDto } from './dto/filter.dto';
+import { CommentGetFilterDto } from './dto/getfilter.dto';
+import { CommentListFilterDto } from './dto/listfilter.dto';
 
 @Injectable()
 export class CommentsService {
@@ -16,9 +17,10 @@ export class CommentsService {
   }
 
   //TODO: Change any with proper interface
-  findAll(filter: CommentFilterDto) {
+  findAll(filter: CommentListFilterDto) {
+    const newFilters = { post: filter.post, id: In(filter.id) };
     return this.repo.find({
-      where: filter, // getting error here...
+      where: newFilters, // getting error here...
       relations: ['post'],
       select: {
         id: true,
@@ -34,7 +36,7 @@ export class CommentsService {
   }
 
   //TODO: Change any with proper interface
-  async findOne(filter: CommentFilterDto) {
+  async findOne(filter: CommentGetFilterDto) {
     return await this.repo.findOne({
       where: filter, // getting error here...
       relations: ['post'],
