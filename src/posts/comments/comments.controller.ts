@@ -53,9 +53,9 @@ export class CommentsController {
     @Param('postId', ParseIntPipe) postId: number,
     @Body() queryDto: findAllQueryDto,
   ) {
-  
+    const commentQuery = new findAllQueryDto(queryDto);
     // queryDto.filter.post = { id: postId };
-    const { filter, pagination, sort } = queryDto;
+    const { filter, pagination, sort } = commentQuery;
     const modifiedFilter: any = { post: { id: postId }, ...filter };
 
     const comments = await this.commentsService.findAll({

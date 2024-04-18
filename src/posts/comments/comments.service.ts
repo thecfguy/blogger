@@ -31,7 +31,7 @@ export class CommentsService {
   }) {
     const { page = 1, maxRows } = pagination || {};
     const skip = ((page - 1) * maxRows) | 0;
-    const take = maxRows || 10;
+    const take = maxRows 
     const where: any = { ...filter };
 
     if (where.id && Array.isArray(where.id)) {

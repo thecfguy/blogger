@@ -3,7 +3,10 @@ import { AlbumDto } from './dto/album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Album } from './entities/album.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
+import { FilterDto } from '@app/common/dto/filter.dto';
+import { PaginationDto } from '@app/common/dto/pagination.dto';
+import { SortDto } from '@app/common/dto/sort.dto';
 
 @Injectable()
 export class AlbumsService {
@@ -14,8 +17,35 @@ export class AlbumsService {
     return await  this.repo.save(album);
   }
 
-  findAll() {
+  findAll({
+    filter,
+    pagination,
+    sort,
+  }: {
+    filter: FilterDto;
+    pagination: PaginationDto;
+    sort: SortDto[];
+  }) {
+    const { page = 1, maxRows } = pagination || {};
+    
+    const skip = ((page - 1) * maxRows) | 0;
+    const take = maxRows 
+    console.log('take',take)
+    const where: any = { ...filter };
+    if (where.id && Array.isArray(where.id)) {
+      where.id = In(where.id);
+    }
+    const order: any = {};
+    if (sort && sort.length > 0) {
+      sort.forEach((item) => {
+        order[item.sortBy] = item.order.toUpperCase();
+      });
+    }
     return this.repo.find({
+      take,
+      skip,
+      where,
+      order,
       relations: ['user'],
       select: {
         id: true,
@@ -30,9 +60,13 @@ export class AlbumsService {
     });
   }
 
-  findOne(id: number) {
+  findOne(filter: FilterDto) {
+    const modifiedFilter: any = {};
+    if (typeof filter.id === 'number') {
+      modifiedFilter.id = filter.id;
+    }
     return this.repo.findOne({
-      where: { id },
+      where:modifiedFilter,
       relations: ['user'],
       select: {
         id: true,

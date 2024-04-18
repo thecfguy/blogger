@@ -3,13 +3,16 @@ import { PaginationDto } from '@app/common/dto/pagination.dto';
 import { SortDto } from '@app/common/dto/sort.dto';
 
 export class findAllQueryDto {
+  constructor(dto?: Partial<findAllQueryDto>) {
+    Object.assign(this, dto);
+    if (dto && dto.pagination === undefined) {
+      console.log('working')
+      this.pagination = { page: 1, maxRows: 50 };
+    }
+  }
   filter?: FilterDto;
   pagination?: PaginationDto;
   sort?: SortDto[];
 
-  constructor(dto?: Partial<findAllQueryDto>) {
-    Object.assign(this, dto);
-    this.pagination = this.pagination || { page: 1, maxRows: 50 };
-    console.log(this.pagination);
-  }
+  
 }

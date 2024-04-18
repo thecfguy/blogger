@@ -4,9 +4,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
-import { User } from '@app/users/entities/user.entity';
-import { Pagination } from '@app/common/interface/pagination.interface';
-import { findAllQueryDto } from '../common/dto/findAllQuery.dto';
+
 import { FilterDto } from '@app/common/dto/filter.dto';
 import { PaginationDto } from '@app/common/dto/pagination.dto';
 import { SortDto } from '@app/common/dto/sort.dto';
@@ -14,8 +12,8 @@ import { SortDto } from '@app/common/dto/sort.dto';
 export class PostsService {
   constructor(@InjectRepository(Post) private repo: Repository<Post>) {}
 
-  async create(createPostDto: PostDto, loginUser: User): Promise<Post> {
-    const post = await this.repo.create({ ...createPostDto, user: loginUser });
+  async create(createPostDto: PostDto): Promise<Post> {
+    const post = await this.repo.create(createPostDto);
 
     return this.repo.save(post);
   }
@@ -29,28 +27,19 @@ export class PostsService {
     pagination: PaginationDto;
     sort: SortDto[];
   }) {
-    
     const { page = 1, maxRows } = pagination || {};
-
     const skip = ((page - 1) * maxRows) | 0;
-
-    const take = maxRows || 10;
-
+    const take = maxRows 
     const where: any = { ...filter };
     if (where.id && Array.isArray(where.id)) {
       where.id = In(where.id);
     }
-    
-
     const order: any = {};
-
     if (sort && sort.length > 0) {
       sort.forEach((item) => {
         order[item.sortBy] = item.order.toUpperCase();
       });
     }
-   
-
     return this.repo.find({
       take,
       skip,
@@ -71,8 +60,8 @@ export class PostsService {
     });
   }
 
-  async findOne(filter: FilterDto ) {
-    const modifiedFilter: any ={}
+  async findOne(filter: FilterDto) {
+    const modifiedFilter: any = {};
     if (typeof filter.id === 'number') {
       modifiedFilter.id = filter.id;
     }
@@ -96,7 +85,6 @@ export class PostsService {
   async update(id: number, updatePostDto: UpdatePostDto) {
     const post = this.repo.create(updatePostDto);
     return await this.repo.update(id, post);
-    
   }
 
   remove(id: number) {

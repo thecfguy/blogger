@@ -28,13 +28,12 @@ export class PostsController {
 
   @Post()
   async create(@Body() createPostDto: PostDto, @GetUser() loginUser: User) {
-
-
-    return await this.postsService.create(createPostDto, loginUser);
+    return await this.postsService.create({...createPostDto, user:loginUser});
   }
 
   @Post('list')
-  async findAll(@Body() postQuery:findAllQueryDto) {
+  async findAll(@Body() queryDto:findAllQueryDto) {
+    const postQuery = new findAllQueryDto(queryDto);
     const { filter, pagination, sort } = postQuery;
     return await this.postsService.findAll({filter, pagination, sort});
   }
