@@ -19,6 +19,7 @@ import { User } from '@app/users/entities/user.entity';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 import { UserDto } from '@app/users/dto/user.dto';
 import { Pagination } from '@app/common/interface/pagination.interface';
+import { findAllQueryDto } from '../common/dto/findAllQuery.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('posts')
@@ -27,18 +28,20 @@ export class PostsController {
 
   @Post()
   async create(@Body() createPostDto: PostDto, @GetUser() loginUser: User) {
+
+
     return await this.postsService.create(createPostDto, loginUser);
   }
 
-  @Get()
-  async findAll(@Query() paginationDto: Pagination) {
-  
-    return await this.postsService.findAll(paginationDto);
+  @Post('list')
+  async findAll(@Body() postQuery:findAllQueryDto) {
+    const { filter, pagination, sort } = postQuery;
+    return await this.postsService.findAll({filter, pagination, sort});
   }
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    const post = await this.postsService.findOne(id);
+    const post = await this.postsService.findOne({id:id});
     if (!post) {
       throw new NotFoundException('Post not found');
     }
@@ -50,7 +53,7 @@ export class PostsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updatePostDto: UpdatePostDto,
   ) {
-    const findPost = await this.postsService.findOne(id);
+    const findPost = await this.postsService.findOne({id:id});
 
     if (!findPost) {
       throw new NotFoundException('Post not found');
@@ -60,7 +63,7 @@ export class PostsController {
 
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
-    const findPost = await this.postsService.findOne(id);
+    const findPost = await this.postsService.findOne({id:id});
 
     if (!findPost) {
       throw new NotFoundException('Post not found');

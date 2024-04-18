@@ -4,8 +4,10 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
-import { CommentFilter } from './dto/commentFilter.interface';
-import { Pagination } from '@app/common/interface/pagination.interface';
+
+import { FilterDto } from '@app/common/dto/filter.dto';
+import { PaginationDto } from '@app/common/dto/pagination.dto';
+import { SortDto } from '@app/common/dto/sort.dto';
 
 @Injectable()
 export class CommentsService {
@@ -13,25 +15,40 @@ export class CommentsService {
 
   async create(createCommentDto: CommentDto) {
     const comment = await this.repo.create(createCommentDto);
-    console.log('comment', comment);
+
     return await this.repo.save(comment);
   }
 
   //TODO: Change any with proper interface
-  findAll(filter: CommentFilter, pagination?: Pagination):Promise<Comment[]> {
-    const modifiedFilter: any = { post: filter.post };
+  findAll({
+    filter,
+    pagination,
+    sort,
+  }: {
+    filter: FilterDto;
+    pagination: PaginationDto;
+    sort: SortDto[];
+  }) {
+    const { page = 1, maxRows } = pagination || {};
+    const skip = ((page - 1) * maxRows) | 0;
+    const take = maxRows || 10;
+    const where: any = { ...filter };
 
-    if (typeof filter.id === 'number') {
-      modifiedFilter.id = filter.id;
-    } else if (Array.isArray(filter.id)) {
-      modifiedFilter.id = In(filter.id);
+    if (where.id && Array.isArray(where.id)) {
+      where.id = In(where.id);
     }
-    const { page = 1, limit = 10 } = pagination;
-    const skip = (page - 1) * limit;
+    const order: any = {};
+
+    if (sort && sort.length > 0) {
+      sort.forEach((item) => {
+        order[item.sortBy] = item.order.toUpperCase();
+      });
+    }
     return this.repo.find({
-      take: limit,
-      skip: skip,
-      where: modifiedFilter,
+      take,
+      skip,
+      where,
+      order,
       relations: ['post'],
       select: {
         id: true,
@@ -47,13 +64,11 @@ export class CommentsService {
   }
 
   //TODO: Change any with proper interface
-  async findOne(filter: CommentFilter):Promise<Comment> {
-    const modifiedFilter: any = { post: filter.post };
-
+  async findOne({ filter }: { filter: FilterDto }): Promise<Comment> {
+    const modifiedFilter: any = { post: filter?.post };
     if (typeof filter.id === 'number') {
       modifiedFilter.id = filter.id;
     }
-    
     return await this.repo.findOne({
       where: modifiedFilter,
       relations: ['post'],

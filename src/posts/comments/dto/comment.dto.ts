@@ -1,6 +1,5 @@
 import { PostDto } from '@app/posts/dto/post.dto';
 
-
 export class CommentDto {
   id: number
   name: string;

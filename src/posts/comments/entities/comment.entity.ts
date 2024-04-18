@@ -15,6 +15,6 @@ export class Comment {
   @Column()
   body: string;
 
-  @ManyToOne(() => Post, (post) => post.comments)
+  @ManyToOne(() => Post, (post) => post.comments, {cascade:true})
   post: Post;
 }

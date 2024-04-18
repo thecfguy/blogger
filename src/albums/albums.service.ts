@@ -9,9 +9,9 @@ import { Repository } from 'typeorm';
 export class AlbumsService {
   constructor(@InjectRepository(Album) private repo: Repository<Album>) {}
 
-  create(createAlbumDto: AlbumDto) {
+  async create(createAlbumDto: AlbumDto) {
     const album = this.repo.create(createAlbumDto);
-    return this.repo.save(album);
+    return await  this.repo.save(album);
   }
 
   findAll() {

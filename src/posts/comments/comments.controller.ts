@@ -21,6 +21,9 @@ import { User } from '@app/users/entities/user.entity';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 import { Pagination } from '@app/common/interface/pagination.interface';
 
+import { findAllQueryDto } from '../../common/dto/findAllQuery.dto';
+import { In } from 'typeorm';
+
 //  implement JwtGuard On Controller
 @UseGuards(JwtAuthGuard)
 @Controller('posts/:postId/comments')
@@ -35,7 +38,7 @@ export class CommentsController {
     @Param('postId', ParseIntPipe) postId: number,
     @Body() createCommentDto: CommentDto,
   ) {
-    const findPost = await this.postsService.findOne(postId);
+    const findPost = await this.postsService.findOne({id:postId});
     if (!findPost) throw new NotFoundException('Post not found');
     const comment = await this.commentsService.create({
       ...createCommentDto,
@@ -45,17 +48,21 @@ export class CommentsController {
     return comment;
   }
 
-  @Get()
+  @Post('list')
   async findAll(
     @Param('postId', ParseIntPipe) postId: number,
-    @Query() paginationDto: Pagination,
+    @Body() queryDto: findAllQueryDto,
   ) {
-    const comments = await this.commentsService.findAll(
-      {
-        post: { id: postId },
-      },
-      paginationDto,
-    );
+  
+    // queryDto.filter.post = { id: postId };
+    const { filter, pagination, sort } = queryDto;
+    const modifiedFilter: any = { post: { id: postId }, ...filter };
+
+    const comments = await this.commentsService.findAll({
+      filter: modifiedFilter,
+      pagination,
+      sort,
+    });
     return comments;
   }
 
@@ -66,12 +73,12 @@ export class CommentsController {
   ) {
     // check if the comment is belongs with the post
     const postComment = await this.commentsService.findOne({
-      id,
-      post: { id: postId },
+      filter:{id,post: { id: postId }},
+     
     });
     // Error: comment not found
     if (!postComment) throw new NotFoundException('Comment not found');
-    return await this.commentsService.findOne({ id, post: { id: postId } });
+    return postComment
   }
 
   @Patch(':id')
@@ -82,15 +89,16 @@ export class CommentsController {
   ) {
     // check if the comment is belongs with the post
     const postComment = await this.commentsService.findOne({
-      id,
-      post: { id: postId },
+      filter:{id,post: { id: postId }},
     });
     // Error: comment not found
     if (!postComment) throw new NotFoundException('Comment not found');
 
     // update the comment
-    return await this.commentsService.update(id, updateCommentDto);
+     await this.commentsService.update(id, updateCommentDto);
+     return updateCommentDto
   }
+
 
   @Delete(':id')
   async remove(
@@ -99,8 +107,7 @@ export class CommentsController {
   ) {
     // check if the comment is belongs with the post
     const postComment = await this.commentsService.findOne({
-      id,
-      post: { id: postId },
+      filter:{id,post: { id: postId }},
     });
     // Error: comment not found
     if (!postComment) throw new NotFoundException('Comment not found');

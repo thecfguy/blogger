@@ -15,7 +15,7 @@ export class DatabaseService implements TypeOrmOptionsFactory {
       database: this.config.get('DB_NAME'),
       autoLoadEntities: true,
       synchronize: false,
-      logging: true,
+      // logging: true,
     };
   }
 }

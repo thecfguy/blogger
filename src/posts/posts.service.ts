@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PostDto } from './dto/post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { User } from '@app/users/entities/user.entity';
 import { Pagination } from '@app/common/interface/pagination.interface';
+import { findAllQueryDto } from '../common/dto/findAllQuery.dto';
+import { FilterDto } from '@app/common/dto/filter.dto';
+import { PaginationDto } from '@app/common/dto/pagination.dto';
+import { SortDto } from '@app/common/dto/sort.dto';
 @Injectable()
 export class PostsService {
   constructor(@InjectRepository(Post) private repo: Repository<Post>) {}
@@ -16,12 +20,42 @@ export class PostsService {
     return this.repo.save(post);
   }
 
-  findAll(pagination: Pagination) {
-    const { page = 1, limit = 10 } = pagination;
-    const skip = (page - 1) * limit;
+  findAll({
+    filter,
+    pagination,
+    sort,
+  }: {
+    filter: FilterDto;
+    pagination: PaginationDto;
+    sort: SortDto[];
+  }) {
+    
+    const { page = 1, maxRows } = pagination || {};
+
+    const skip = ((page - 1) * maxRows) | 0;
+
+    const take = maxRows || 10;
+
+    const where: any = { ...filter };
+    if (where.id && Array.isArray(where.id)) {
+      where.id = In(where.id);
+    }
+    
+
+    const order: any = {};
+
+    if (sort && sort.length > 0) {
+      sort.forEach((item) => {
+        order[item.sortBy] = item.order.toUpperCase();
+      });
+    }
+   
+
     return this.repo.find({
-      take: limit,
-      skip: skip,
+      take,
+      skip,
+      where,
+      order,
       relations: ['user'],
       select: {
         id: true,
@@ -37,9 +71,13 @@ export class PostsService {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(filter: FilterDto ) {
+    const modifiedFilter: any ={}
+    if (typeof filter.id === 'number') {
+      modifiedFilter.id = filter.id;
+    }
     return await this.repo.findOne({
-      where: { id },
+      where: modifiedFilter,
       relations: ['user'],
       select: {
         id: true,
@@ -57,8 +95,8 @@ export class PostsService {
 
   async update(id: number, updatePostDto: UpdatePostDto) {
     const post = this.repo.create(updatePostDto);
-    await this.repo.update(id, post);
-    return this.findOne(id);
+    return await this.repo.update(id, post);
+    
   }
 
   remove(id: number) {
