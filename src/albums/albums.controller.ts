@@ -32,6 +32,7 @@ export class AlbumsController {
   async findAll(@Body() queryDto:findAllQueryDto) {
     const albumQuery = new findAllQueryDto(queryDto);
     const { filter, pagination, sort } = albumQuery;
+   
     return await this.albumsService.findAll({ filter, pagination, sort });
   }
 
