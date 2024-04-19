@@ -18,7 +18,8 @@ import { findAllQueryDto } from '@app/common/dto/findAllQuery.dto';
 import { GetUser } from '@app/common/decorator/getUser.decorator';
 import { User } from '@app/users/entities/user.entity';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
-@UseGuards(JwtAuthGuard)
+import { AlbumfindAllBodyDto } from './dto/albumFindAll-body.dto';
+// @UseGuards(JwtAuthGuard)
 @Controller('albums')
 export class AlbumsController {
   constructor(private readonly albumsService: AlbumsService) {}
@@ -29,9 +30,9 @@ export class AlbumsController {
   }
 
   @Post('list')
-  async findAll(@Body() queryDto:findAllQueryDto) {
-    const albumQuery = new findAllQueryDto(queryDto);
-    const { filter, pagination, sort } = albumQuery;
+  async findAll(@Body() queryDto:AlbumfindAllBodyDto) {
+    // const albumQuery = new findAllQueryDto(queryDto);
+    const { filter, pagination, sort } = queryDto;
    
     return await this.albumsService.findAll({ filter, pagination, sort });
   }

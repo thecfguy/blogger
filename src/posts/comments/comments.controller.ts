@@ -23,9 +23,10 @@ import { Pagination } from '@app/common/interface/pagination.interface';
 
 import { findAllQueryDto } from '../../common/dto/findAllQuery.dto';
 import { In } from 'typeorm';
+import { CommentfindAllBodyDto } from './dto/commentFindAll-body.dto';
 
 //  implement JwtGuard On Controller
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 @Controller('posts/:postId/comments')
 export class CommentsController {
   constructor(
@@ -51,11 +52,11 @@ export class CommentsController {
   @Post('list')
   async findAll(
     @Param('postId', ParseIntPipe) postId: number,
-    @Body() queryDto: findAllQueryDto,
+    @Body() queryDto: CommentfindAllBodyDto,
   ) {
-    const commentQuery = new findAllQueryDto(queryDto);
+    // const commentQuery = new findAllQueryDto(queryDto);
     // queryDto.filter.post = { id: postId };
-    const { filter, pagination, sort } = commentQuery;
+    const { filter, pagination, sort } = queryDto;
     const modifiedFilter: any = { post: { id: postId }, ...filter };
 
     const comments = await this.commentsService.findAll({

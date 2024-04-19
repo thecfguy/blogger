@@ -7,6 +7,8 @@ import { In, Repository } from 'typeorm';
 import { FilterDto } from '@app/common/dto/filter.dto';
 import { PaginationDto } from '@app/common/dto/pagination.dto';
 import { SortDto } from '@app/common/dto/sort.dto';
+import { AlbumFilterDto } from './dto/album-filter.dto';
+import { AlbumSortDto } from './dto/album-sort.dto';
 
 @Injectable()
 export class AlbumsService {
@@ -22,9 +24,9 @@ export class AlbumsService {
     pagination,
     sort,
   }: {
-    filter: FilterDto;
+    filter: AlbumFilterDto;
     pagination: PaginationDto;
-    sort: SortDto[];
+    sort: AlbumSortDto[];
   }) {
     const { page = 1, maxRows } = pagination || {};
     

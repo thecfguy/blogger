@@ -8,6 +8,9 @@ import { Album } from '../entities/album.entity';
 import { FilterDto } from '@app/common/dto/filter.dto';
 import { PaginationDto } from '@app/common/dto/pagination.dto';
 import { SortDto } from '@app/common/dto/sort.dto';
+
+import { PhotoFilterDto } from './dto/photo-filter.dto';
+import { PhotoSortDto } from './dto/photo-sort.dto';
 @Injectable()
 export class PhotosService {
   constructor(
@@ -24,11 +27,11 @@ export class PhotosService {
     pagination,
     sort,
   }: {
-    filter: FilterDto;
+    filter: PhotoFilterDto;
     pagination: PaginationDto;
-    sort: SortDto[];
+    sort: PhotoSortDto[];
   }) {
-    
+   
     const { page = 1, maxRows } = pagination || {};
     const skip = ((page - 1) * maxRows) | 0;
     const take = maxRows ;
@@ -44,6 +47,7 @@ export class PhotosService {
         order[item.sortBy] = item.order.toUpperCase();
       });
     }
+    
     return this.repo.find({
       take,
       skip,

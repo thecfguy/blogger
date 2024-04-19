@@ -20,8 +20,9 @@ import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 import { UserDto } from '@app/users/dto/user.dto';
 import { Pagination } from '@app/common/interface/pagination.interface';
 import { findAllQueryDto } from '../common/dto/findAllQuery.dto';
+import { PostfindAllBodyDto } from './dto/postFindAll-body.dto';
 
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
@@ -32,9 +33,9 @@ export class PostsController {
   }
 
   @Post('list')
-  async findAll(@Body() queryDto:findAllQueryDto) {
-    const postQuery = new findAllQueryDto(queryDto);
-    const { filter, pagination, sort } = postQuery;
+  async findAll(@Body() queryDto:PostfindAllBodyDto) {
+    // const postQuery = new PostfindAllBodyDto(queryDto);
+    const { filter, pagination, sort } = queryDto;
     return await this.postsService.findAll({filter, pagination, sort});
   }
 

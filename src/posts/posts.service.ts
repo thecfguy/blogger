@@ -8,6 +8,8 @@ import { Post } from './entities/post.entity';
 import { FilterDto } from '@app/common/dto/filter.dto';
 import { PaginationDto } from '@app/common/dto/pagination.dto';
 import { SortDto } from '@app/common/dto/sort.dto';
+import { PostFilterDto } from './dto/post-filter.dto';
+import { PostSortDto } from './dto/post-sort.dto';
 @Injectable()
 export class PostsService {
   constructor(@InjectRepository(Post) private repo: Repository<Post>) {}
@@ -23,10 +25,11 @@ export class PostsService {
     pagination,
     sort,
   }: {
-    filter: FilterDto;
+    filter: PostFilterDto;
     pagination: PaginationDto;
-    sort: SortDto[];
+    sort: PostSortDto[];
   }) {
+     
     const { page = 1, maxRows } = pagination || {};
     const skip = ((page - 1) * maxRows) | 0;
     const take = maxRows 
@@ -40,6 +43,9 @@ export class PostsService {
         order[item.sortBy] = item.order.toUpperCase();
       });
     }
+    
+
+    // return order
     return this.repo.find({
       take,
       skip,

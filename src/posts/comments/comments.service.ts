@@ -8,6 +8,8 @@ import { Comment } from './entities/comment.entity';
 import { FilterDto } from '@app/common/dto/filter.dto';
 import { PaginationDto } from '@app/common/dto/pagination.dto';
 import { SortDto } from '@app/common/dto/sort.dto';
+import { CommentFilterDto } from './dto/comment-filter.dto';
+import { CommentSortDto } from './dto/comment-sort.dto';
 
 @Injectable()
 export class CommentsService {
@@ -25,15 +27,16 @@ export class CommentsService {
     pagination,
     sort,
   }: {
-    filter: FilterDto;
+    filter: CommentFilterDto;
     pagination: PaginationDto;
-    sort: SortDto[];
+    sort: CommentSortDto[];
   }) {
+    console.log(filter,pagination,sort)
     const { page = 1, maxRows } = pagination || {};
     const skip = ((page - 1) * maxRows) | 0;
     const take = maxRows 
     const where: any = { ...filter };
-
+    
     if (where.id && Array.isArray(where.id)) {
       where.id = In(where.id);
     }

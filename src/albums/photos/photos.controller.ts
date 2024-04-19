@@ -17,7 +17,8 @@ import { AlbumsService } from '../albums.service';
 import { AlbumDto } from '../dto/album.dto';
 import { findAllQueryDto } from '@app/common/dto/findAllQuery.dto';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
-@UseGuards(JwtAuthGuard)
+import { PhotofindAllBodyDto } from './dto/photoFindAll-body.dto';
+// @UseGuards(JwtAuthGuard)
 @Controller('albums/:albumId/photos')
 export class PhotosController {
   constructor(
@@ -42,10 +43,10 @@ export class PhotosController {
   @Post('list')
   async findAll(
     @Param('albumId', ParseIntPipe) albumId: number,
-    @Body() queryDto: findAllQueryDto,
+    @Body() queryDto: PhotofindAllBodyDto,
   ) {
-    const photoQuery = new findAllQueryDto(queryDto);
-    const { filter, pagination, sort } = photoQuery;
+    // const photoQuery = new findAllQueryDto(queryDto);
+    const { filter, pagination, sort } = queryDto;
     const modifiedFilter: any = { album: { id: albumId }, ...filter };
     return this.photosService.findAll({
       filter: modifiedFilter,
