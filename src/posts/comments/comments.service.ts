@@ -4,10 +4,7 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
-
-import { FilterDto } from '@app/common/dto/filter.dto';
 import { PaginationDto } from '@app/common/dto/pagination.dto';
-import { SortDto } from '@app/common/dto/sort.dto';
 import { CommentFilterDto } from './dto/comment-filter.dto';
 import { CommentSortDto } from './dto/comment-sort.dto';
 
@@ -30,7 +27,7 @@ export class CommentsService {
     filter: CommentFilterDto;
     pagination: PaginationDto;
     sort: CommentSortDto[];
-  }) {
+  }): Promise<Comment[]> {
     console.log(filter,pagination,sort)
     const { page = 1, maxRows } = pagination || {};
     const skip = ((page - 1) * maxRows) | 0;
@@ -67,7 +64,7 @@ export class CommentsService {
   }
 
   //TODO: Change any with proper interface
-  async findOne({ filter }: { filter: FilterDto }): Promise<Comment> {
+  async findOne({ filter }: { filter: CommentFilterDto }): Promise<Comment> {
     const modifiedFilter: any = { post: filter?.post };
     if (typeof filter.id === 'number') {
       modifiedFilter.id = filter.id;

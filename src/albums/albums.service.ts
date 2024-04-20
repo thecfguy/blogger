@@ -4,9 +4,7 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Album } from './entities/album.entity';
 import { In, Repository } from 'typeorm';
-import { FilterDto } from '@app/common/dto/filter.dto';
 import { PaginationDto } from '@app/common/dto/pagination.dto';
-import { SortDto } from '@app/common/dto/sort.dto';
 import { AlbumFilterDto } from './dto/album-filter.dto';
 import { AlbumSortDto } from './dto/album-sort.dto';
 
@@ -62,7 +60,7 @@ export class AlbumsService {
     });
   }
 
-  findOne(filter: FilterDto) {
+  findOne(filter: AlbumFilterDto) {
     const modifiedFilter: any = {};
     if (typeof filter.id === 'number') {
       modifiedFilter.id = filter.id;

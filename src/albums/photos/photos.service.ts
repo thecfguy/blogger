@@ -5,10 +5,7 @@ import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Photo } from './entities/photo.entity';
 import { Album } from '../entities/album.entity';
-import { FilterDto } from '@app/common/dto/filter.dto';
 import { PaginationDto } from '@app/common/dto/pagination.dto';
-import { SortDto } from '@app/common/dto/sort.dto';
-
 import { PhotoFilterDto } from './dto/photo-filter.dto';
 import { PhotoSortDto } from './dto/photo-sort.dto';
 @Injectable()
@@ -67,8 +64,8 @@ export class PhotosService {
     });
   }
 
-  findOne({ filter }: { filter: FilterDto }) {
-    const modifiedFilter: any = { album: filter?.post };
+  findOne({ filter }: { filter: PhotoFilterDto }) {
+    const modifiedFilter: any = { album: filter?.album };
     if (typeof filter.id === 'number') {
       modifiedFilter.id = filter.id;
     }
@@ -90,7 +87,7 @@ export class PhotosService {
 
   async update(albumId, id: number, updatePhotoDto: UpdatePhotoDto) {
     const photo = await this.findOne({
-      filter: { id, post: { id: albumId } },
+      filter: { id, album: { id: albumId } },
     });
     if (!photo) {
       return null;

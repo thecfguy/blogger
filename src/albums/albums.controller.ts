@@ -14,7 +14,6 @@ import {
 import { AlbumsService } from './albums.service';
 import { AlbumDto } from './dto/album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { findAllQueryDto } from '@app/common/dto/findAllQuery.dto';
 import { GetUser } from '@app/common/decorator/getUser.decorator';
 import { User } from '@app/users/entities/user.entity';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';

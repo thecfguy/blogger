@@ -17,10 +17,8 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { GetUser } from '@app/common/decorator/getUser.decorator';
 import { User } from '@app/users/entities/user.entity';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
-import { UserDto } from '@app/users/dto/user.dto';
-import { Pagination } from '@app/common/interface/pagination.interface';
-import { findAllQueryDto } from '../common/dto/findAllQuery.dto';
 import { PostfindAllBodyDto } from './dto/postFindAll-body.dto';
+import { ValidatePost } from './guard/ValidatePost.guard';
 
 // @UseGuards(JwtAuthGuard)
 @Controller('posts')
@@ -34,12 +32,13 @@ export class PostsController {
 
   @Post('list')
   async findAll(@Body() queryDto:PostfindAllBodyDto) {
-    // const postQuery = new PostfindAllBodyDto(queryDto);
+    
     const { filter, pagination, sort } = queryDto;
     return await this.postsService.findAll({filter, pagination, sort});
   }
 
   @Get(':id')
+  @UseGuards(ValidatePost)
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const post = await this.postsService.findOne({id:id});
     if (!post) {
@@ -49,25 +48,27 @@ export class PostsController {
   }
 
   @Patch(':id')
+  @UseGuards(ValidatePost)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updatePostDto: UpdatePostDto,
   ) {
-    const findPost = await this.postsService.findOne({id:id});
+    // const findPost = await this.postsService.findOne({id:id});
 
-    if (!findPost) {
-      throw new NotFoundException('Post not found');
-    }
+    // if (!findPost) {
+    //   throw new NotFoundException('Post not found');
+    // }
     return await this.postsService.update(id, updatePostDto);
   }
 
   @Delete(':id')
+  @UseGuards(ValidatePost)
   async remove(@Param('id', ParseIntPipe) id: number) {
-    const findPost = await this.postsService.findOne({id:id});
+    // const findPost = await this.postsService.findOne({id:id});
 
-    if (!findPost) {
-      throw new NotFoundException('Post not found');
-    }
+    // if (!findPost) {
+    //   throw new NotFoundException('Post not found');
+    // }
     return await this.postsService.remove(id);
   }
 }

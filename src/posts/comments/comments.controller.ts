@@ -16,17 +16,13 @@ import { ParseIntPipe } from '@nestjs/common';
 import { PostsService } from '../posts.service';
 import { NotFoundException } from '@nestjs/common';
 import { PostDto } from '../dto/post.dto';
-import { GetUser } from '@app/common/decorator/getUser.decorator';
-import { User } from '@app/users/entities/user.entity';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
-import { Pagination } from '@app/common/interface/pagination.interface';
-
-import { findAllQueryDto } from '../../common/dto/findAllQuery.dto';
-import { In } from 'typeorm';
 import { CommentfindAllBodyDto } from './dto/commentFindAll-body.dto';
+import { ValidatePostAndComment } from './guard/ValidatePostAndComment.guard';
 
 //  implement JwtGuard On Controller
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
+
 @Controller('posts/:postId/comments')
 export class CommentsController {
   constructor(
@@ -39,8 +35,8 @@ export class CommentsController {
     @Param('postId', ParseIntPipe) postId: number,
     @Body() createCommentDto: CommentDto,
   ) {
-    const findPost = await this.postsService.findOne({id:postId});
-    if (!findPost) throw new NotFoundException('Post not found');
+    // const findPost = await this.postsService.findOne({id:postId});
+    // if (!findPost) throw new NotFoundException('Post not found');
     const comment = await this.commentsService.create({
       ...createCommentDto,
       post: { id: postId } as PostDto,
@@ -68,6 +64,7 @@ export class CommentsController {
   }
 
   @Get(':id')
+  @UseGuards(ValidatePostAndComment)
   async findOne(
     @Param('postId', ParseIntPipe) postId: number,
     @Param('id', ParseIntPipe) id: number,
@@ -78,22 +75,23 @@ export class CommentsController {
      
     });
     // Error: comment not found
-    if (!postComment) throw new NotFoundException('Comment not found');
+    // if (!postComment) throw new NotFoundException('Comment not found');
     return postComment
   }
 
   @Patch(':id')
+  @UseGuards(ValidatePostAndComment)
   async update(
     @Param('postId', ParseIntPipe) postId: number,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateCommentDto: UpdateCommentDto,
   ) {
-    // check if the comment is belongs with the post
-    const postComment = await this.commentsService.findOne({
-      filter:{id,post: { id: postId }},
-    });
-    // Error: comment not found
-    if (!postComment) throw new NotFoundException('Comment not found');
+    // // check if the comment is belongs with the post
+    // const postComment = await this.commentsService.findOne({
+    //   filter:{id,post: { id: postId }},
+    // });
+    // // Error: comment not found
+    // if (!postComment) throw new NotFoundException('Comment not found');
 
     // update the comment
      await this.commentsService.update(id, updateCommentDto);
@@ -102,16 +100,17 @@ export class CommentsController {
 
 
   @Delete(':id')
+  @UseGuards(ValidatePostAndComment)
   async remove(
     @Param('postId', ParseIntPipe) postId: number,
     @Param('id', ParseIntPipe) id: number,
   ) {
     // check if the comment is belongs with the post
-    const postComment = await this.commentsService.findOne({
-      filter:{id,post: { id: postId }},
-    });
-    // Error: comment not found
-    if (!postComment) throw new NotFoundException('Comment not found');
+    // const postComment = await this.commentsService.findOne({
+    //   filter:{id,post: { id: postId }},
+    // });
+    // // Error: comment not found
+    // if (!postComment) throw new NotFoundException('Comment not found');
     return await this.commentsService.remove(id);
   }
 }

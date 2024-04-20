@@ -4,10 +4,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
-
-import { FilterDto } from '@app/common/dto/filter.dto';
 import { PaginationDto } from '@app/common/dto/pagination.dto';
-import { SortDto } from '@app/common/dto/sort.dto';
 import { PostFilterDto } from './dto/post-filter.dto';
 import { PostSortDto } from './dto/post-sort.dto';
 @Injectable()
@@ -16,7 +13,6 @@ export class PostsService {
 
   async create(createPostDto: PostDto): Promise<Post> {
     const post = await this.repo.create(createPostDto);
-
     return this.repo.save(post);
   }
 
@@ -28,7 +24,7 @@ export class PostsService {
     filter: PostFilterDto;
     pagination: PaginationDto;
     sort: PostSortDto[];
-  }) {
+  }): Promise<Post[]> {
      
     const { page = 1, maxRows } = pagination || {};
     const skip = ((page - 1) * maxRows) | 0;
@@ -43,9 +39,7 @@ export class PostsService {
         order[item.sortBy] = item.order.toUpperCase();
       });
     }
-    
-
-    // return order
+       
     return this.repo.find({
       take,
       skip,
@@ -66,11 +60,13 @@ export class PostsService {
     });
   }
 
-  async findOne(filter: FilterDto) {
+  async findOne(filter: PostFilterDto): Promise<Post> {
+    console.log('filter', typeof filter.id)
     const modifiedFilter: any = {};
     if (typeof filter.id === 'number') {
       modifiedFilter.id = filter.id;
     }
+    
     return await this.repo.findOne({
       where: modifiedFilter,
       relations: ['user'],
@@ -89,6 +85,7 @@ export class PostsService {
   }
 
   async update(id: number, updatePostDto: UpdatePostDto) {
+
     const post = this.repo.create(updatePostDto);
     return await this.repo.update(id, post);
   }

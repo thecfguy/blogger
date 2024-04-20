@@ -15,7 +15,6 @@ import { PhotoDto } from './dto/photo.dto';
 import { UpdatePhotoDto } from './dto/update-photo.dto';
 import { AlbumsService } from '../albums.service';
 import { AlbumDto } from '../dto/album.dto';
-import { findAllQueryDto } from '@app/common/dto/findAllQuery.dto';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 import { PhotofindAllBodyDto } from './dto/photoFindAll-body.dto';
 // @UseGuards(JwtAuthGuard)
@@ -61,7 +60,7 @@ export class PhotosController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     const albumPhoto = await this.photosService.findOne({
-      filter:{id,post : { id: albumId }},
+      filter:{id,album : { id: albumId }},
      
     });
     if (!albumPhoto) {
@@ -77,7 +76,7 @@ export class PhotosController {
     @Body() updatePhotoDto: UpdatePhotoDto,
   ) {
     const albumPhoto = await this.photosService.findOne({
-      filter:{id,post : { id: albumId }},
+      filter:{id,album : { id: albumId }},
      
     });
     if (!albumPhoto) {
@@ -93,7 +92,7 @@ export class PhotosController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     const albumPhoto = await this.photosService.findOne({
-      filter:{id,post : { id: albumId }},
+      filter:{id,album : { id: albumId }},
      
     });
     if (!albumPhoto) {
