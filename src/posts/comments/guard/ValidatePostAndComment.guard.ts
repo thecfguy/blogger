@@ -18,7 +18,7 @@ export class ValidatePostAndComment implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    // get the user id from the user from request
+    // get the user id from the user from request 
     const userId = +request.user?.id;
    
     const postId = +request.params?.postId;
