@@ -1,20 +1,21 @@
 import { Post } from '@app/posts/entities/post.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique } from 'typeorm';
 
 @Entity({ name: 'comments' })
+@Unique(['email'])
 export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ length: 255, nullable: false }) 
   name: string;
 
-  @Column()
+  @Column({ unique: true, nullable: false }) 
   email: string;
 
-  @Column()
+  @Column({ nullable: false }) 
   body: string;
 
-  @ManyToOne(() => Post, (post) => post.comments, {cascade:true})
+  @ManyToOne(() => Post, (post) => post.comments, { cascade: true })
   post: Post;
 }

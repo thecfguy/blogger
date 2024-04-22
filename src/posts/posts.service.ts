@@ -6,6 +6,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { PostFilterDto } from './dto/post-filter.dto';
 import { PostFindDto } from './dto/post-find.dto';
+import { sortTransform } from '@app/common/service/sort-transform';
+
 @Injectable()
 export class PostsService {
   constructor(@InjectRepository(Post) private repo: Repository<Post>) {}
@@ -28,12 +30,7 @@ export class PostsService {
     }
 
     //Sort Logic
-    const order: any = {};
-    if (sort && sort.length > 0) {
-      sort.forEach((item) => {
-        order[item.sortBy] = item.order.toUpperCase();
-      });
-    }
+    const order = sortTransform(sort);
 
     return this.repo.find({
       take,
@@ -80,7 +77,8 @@ export class PostsService {
 
   async update(id: number, updatePostDto: UpdatePostDto) {
     const post = this.repo.create(updatePostDto);
-    return await this.repo.update(id, post);
+    await this.repo.update(id, post);
+    return this.findOne({ id: id });
   }
 
   remove(id: number) {

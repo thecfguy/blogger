@@ -8,6 +8,7 @@ import { PostsModule } from './posts/posts.module';
 import { ConfigModule } from '@app/common/config/config.module';
 import { DatabaseModule } from './common/database/database.module';
 import { AuthModule } from './auth/auth.module';
+import { ResponseFormateInterceptor } from './common/interceptor/response-formate.interceptor';
 @Module({
   imports: [
     UsersModule,
@@ -19,6 +20,11 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,
+    {
+    provide: 'APP_INTERCEPTOR',
+    useClass: ResponseFormateInterceptor,
+  }
+  ,],
 })
 export class AppModule {}

@@ -13,10 +13,10 @@ export class Post {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
+  @Column({length: 255, nullable: false })
   title: string;
 
-  @Column({ nullable: false })
+  @Column({length: 255, nullable: false })
   body: string;
 
   @ManyToOne(() => User, (user) => user.posts)

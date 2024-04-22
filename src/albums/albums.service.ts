@@ -4,15 +4,9 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Album } from './entities/album.entity';
 import { In, Repository } from 'typeorm';
-import { PaginationDto } from '@app/common/dto/pagination.dto';
 import { AlbumFilterDto } from './dto/album-filter.dto';
-import { AlbumSortDto } from './dto/album-sort.dto';
-
-interface FindAllArgs {
-  filter: AlbumFilterDto;
-  pagination: PaginationDto;
-  sort: AlbumSortDto[];
-}
+import { AlbumFindDto } from './dto/album-find.dto';
+import { sortTransform } from '@app/common/service/sort-transform';
 
 @Injectable()
 export class AlbumsService {
@@ -23,21 +17,20 @@ export class AlbumsService {
     return await this.repo.save(album);
   }
 
-  findAll({ filter, pagination, sort }: FindAllArgs) {
-    const { page = 1, maxRows } = pagination || {};
-
+  findAll({ filter, pagination, sort }: AlbumFindDto):Promise<Album[]> {
+    //Pagination Logic
+    const { page, maxRows } = pagination;
     const skip = ((page - 1) * maxRows) | 0;
     const take = maxRows;
+
+    //Find Logic
     const where: any = { ...filter };
     if (where.id && Array.isArray(where.id)) {
       where.id = In(where.id);
     }
-    const order: any = {};
-    if (sort && sort.length > 0) {
-      sort.forEach((item) => {
-        order[item.sortBy] = item.order.toUpperCase();
-      });
-    }
+
+    //Sort Logic
+    const order = sortTransform(sort);
     return this.repo.find({
       take,
       skip,
@@ -57,7 +50,7 @@ export class AlbumsService {
     });
   }
 
-  findOne(filter: AlbumFilterDto) {
+  findOne(filter: AlbumFilterDto):Promise<Album> {
     const modifiedFilter: any = {};
     if (typeof filter.id === 'number') {
       modifiedFilter.id = filter.id;
@@ -78,13 +71,11 @@ export class AlbumsService {
     });
   }
 
-  async update(id: number, updateAlbumDto: UpdateAlbumDto) {
-    const album = await this.repo.findOneBy({ id });
-    if (!album) {
-      return null;
-    }
+  async update(id: number, updateAlbumDto: UpdateAlbumDto, album) {
     Object.assign(album, updateAlbumDto);
-    return await this.repo.save(album);
+    await this.repo.save(album);
+
+    return this.findOne({ id: id });
   }
 
   remove(id: number) {

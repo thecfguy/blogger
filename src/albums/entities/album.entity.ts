@@ -14,7 +14,7 @@ export class Album {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
+  @Column({ length: 255,nullable: false })
   title: string;
 
   @ManyToOne(() => User, (user) => user.albums)

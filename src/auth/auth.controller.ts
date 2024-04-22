@@ -9,9 +9,8 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('login')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(LocalGuard)
   async login(@Body() user: UserDto) {
-    console.log('user', this.authService.login(user));
     return this.authService.login(user);
   }
 }
