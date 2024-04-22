@@ -89,6 +89,12 @@ export class UsersService {
     );
   }
 
+  async findbyEmail(email: string) {
+    const user = await this.repo.findOne({ where: { email: email } });
+
+    return user;
+  }
+
   remove(id: number) {
     return this.repo.delete(id);
   }

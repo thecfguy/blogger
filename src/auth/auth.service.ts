@@ -1,6 +1,6 @@
 import { UserDto } from '@app/users/dto/user.dto';
 import { UsersService } from '@app/users/users.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -21,7 +21,13 @@ export class AuthService {
   }
 
   async login(user: UserDto) {
-    const payload = { username: user.username, sub: user.id };
+    
+    const findUser= await this.userService.findbyEmail(user.email)
+    if(!findUser){
+      throw new NotFoundException('user not found')
+    }
+
+    const payload = { email: user.email, sub: findUser.id };
     return {
       access_token: this.jwtService.sign(payload),
     };
