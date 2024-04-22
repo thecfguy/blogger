@@ -1,4 +1,3 @@
 export class AlbumFilterDto {
-    id?: number | number[];
-   
+  id?: number | number[];
 }

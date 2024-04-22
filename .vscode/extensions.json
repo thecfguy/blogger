@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "pflannery.vscode-versionlens",
+    "mhutchie.git-graph",
+    "streetsidesoftware.code-spell-checker",
+    "dsznajder.es7-react-js-snippets",
+    "EditorConfig.EditorConfig"
+  ]
+}

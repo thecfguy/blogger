@@ -17,14 +17,13 @@ async function bootstrap() {
   app.use(helmet());
   app.useGlobalPipes(
     new ValidationPipe({
-    
       forbidNonWhitelisted: true,
       transform: true,
     }),
   );
   const httpAdapterHost = app.get(HttpAdapterHost);
-  // app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost));
-  // app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost));
+  app.useGlobalFilters(new HttpExceptionFilter());
   app.enableCors();
   await app.listen(3000);
 }
