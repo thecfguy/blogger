@@ -4,9 +4,8 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
-import { PaginationDto } from '@app/common/dto/pagination.dto';
 import { PostFilterDto } from './dto/post-filter.dto';
-import { PostSortDto } from './dto/post-sort.dto';
+import { PostFindDto } from './dto/post-find.dto';
 @Injectable()
 export class PostsService {
   constructor(@InjectRepository(Post) private repo: Repository<Post>) {}
@@ -16,30 +15,26 @@ export class PostsService {
     return this.repo.save(post);
   }
 
-  findAll({
-    filter,
-    pagination,
-    sort,
-  }: {
-    filter: PostFilterDto;
-    pagination: PaginationDto;
-    sort: PostSortDto[];
-  }): Promise<Post[]> {
-     
-    const { page = 1, maxRows } = pagination || {};
+  findAll({ filter, pagination, sort }: PostFindDto): Promise<Post[]> {
+    //Pagination Logic
+    const { page, maxRows } = pagination;
     const skip = ((page - 1) * maxRows) | 0;
-    const take = maxRows 
+    const take = maxRows;
+
+    //Find Logic
     const where: any = { ...filter };
     if (where.id && Array.isArray(where.id)) {
       where.id = In(where.id);
     }
+
+    //Sort Logic
     const order: any = {};
     if (sort && sort.length > 0) {
       sort.forEach((item) => {
         order[item.sortBy] = item.order.toUpperCase();
       });
     }
-       
+
     return this.repo.find({
       take,
       skip,
@@ -61,12 +56,11 @@ export class PostsService {
   }
 
   async findOne(filter: PostFilterDto): Promise<Post> {
-    console.log('filter', typeof filter.id)
     const modifiedFilter: any = {};
     if (typeof filter.id === 'number') {
       modifiedFilter.id = filter.id;
     }
-    
+
     return await this.repo.findOne({
       where: modifiedFilter,
       relations: ['user'],
@@ -85,7 +79,6 @@ export class PostsService {
   }
 
   async update(id: number, updatePostDto: UpdatePostDto) {
-
     const post = this.repo.create(updatePostDto);
     return await this.repo.update(id, post);
   }

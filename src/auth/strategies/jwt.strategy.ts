@@ -6,7 +6,10 @@ import { UsersService } from '@app/users/users.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private config: ConfigService,private userService:UsersService) {
+  constructor(
+    private config: ConfigService,
+    private userService: UsersService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -19,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException();
     }
-    delete  user.password
+    delete user.password;
     return user;
   }
 }

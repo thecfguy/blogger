@@ -21,10 +21,9 @@ export class AuthService {
   }
 
   async login(user: UserDto) {
-    
-    const findUser= await this.userService.findbyEmail(user.email)
-    if(!findUser){
-      throw new NotFoundException('user not found')
+    const findUser = await this.userService.findbyEmail(user.email);
+    if (!findUser) {
+      throw new NotFoundException('user not found');
     }
 
     const payload = { email: user.email, sub: findUser.id };

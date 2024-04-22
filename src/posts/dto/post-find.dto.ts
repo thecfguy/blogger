@@ -1,10 +1,10 @@
-import { PaginationDto } from "@app/common/dto/pagination.dto";
-import { PostFilterDto } from "./post-filter.dto";
-import { PostSortDto } from "./post-sort.dto";
-import { IsOptional, ValidateNested } from "class-validator";
-import { Type } from "class-transformer";
+import { PaginationDto } from '@app/common/dto/pagination.dto';
+import { PostFilterDto } from './post-filter.dto';
+import { PostSortDto } from './post-sort.dto';
+import { IsOptional, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
-export class PostfindAllBodyDto {
+export class PostFindDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => PostFilterDto)

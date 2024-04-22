@@ -1,4 +1,3 @@
 export class PostFilterDto {
-    id?: number | number[];
-   
+  id?: number | number[];
 }
