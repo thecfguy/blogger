@@ -20,8 +20,10 @@ import { PostFindDto } from './dto/post-find.dto';
 import { ValidatePost } from './guard/ValidatePost.guard';
 import { Request } from 'express';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
+import { ResponseValidationInterceptor } from '@app/common/interceptor/response-validate.interceptor';
 
 @UseGuards(JwtAuthGuard)
+@UseInterceptors( new ResponseValidationInterceptor(PostDto))
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}

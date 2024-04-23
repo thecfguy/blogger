@@ -10,6 +10,7 @@ import {
   NotFoundException,
   UseGuards,
   Req,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PhotosService } from './photos.service';
 import { PhotoDto } from './dto/photo.dto';
@@ -19,7 +20,9 @@ import { AlbumDto } from '../dto/album.dto';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 import { PhotoFindDto } from './dto/photo-find.dto';
 import { ValidateAlbumAndPhoto } from './guard/validateAlbumAndPhoto.guard';
-// @UseGuards(JwtAuthGuard)
+import { ResponseValidationInterceptor } from '@app/common/interceptor/response-validate.interceptor';
+@UseGuards(JwtAuthGuard)
+@UseInterceptors( new ResponseValidationInterceptor(PhotoDto))
 @Controller('albums/:albumId/photos')
 export class PhotosController {
   constructor(

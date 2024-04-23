@@ -18,18 +18,21 @@ import { PostDto } from '../dto/post.dto';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 import { CommentFindDto } from './dto/comment-find.dto';
 import { ValidatePostAndComment } from './guard/ValidatePostAndComment.guard';
+import { ResponseValidationInterceptor } from '../../common/interceptor/response-validate.interceptor';
+import { PaginationDto } from '@app/common/dto/pagination.dto';
+
 
 
 //  implement JwtGuard On Controller
 @UseGuards(JwtAuthGuard)
+@UseInterceptors( new ResponseValidationInterceptor(CommentDto))
 @Controller('posts/:postId/comments')
 export class CommentsController {
   constructor(
     private readonly commentsService: CommentsService,
   ) {}
 
-  @Post()
-  // @UseInterceptors(CommentResponseInterceptor)
+  @Post()  
    create(
     @Param('postId', ParseIntPipe) postId: number,
     @Body() createCommentDto: CommentDto,
@@ -40,25 +43,27 @@ export class CommentsController {
     });    
   }
 
-  @Post('list')
+  @Post('list') 
   async findAll(
     @Param('postId', ParseIntPipe) postId: number,
     @Body() queryDto: CommentFindDto,
+    @Req() req
   ): Promise<CommentDto[]>  {
-
+    
     const { filter, pagination, sort } = queryDto;
     const modifiedFilter: any = { post: { id: postId }, ...filter };
-
-    const comments = await this.commentsService.findAll({
+    const {data: comments, count} = await this.commentsService.findAll({
       filter: modifiedFilter,
       pagination,
       sort,
     });
+    const {page,maxRows}=pagination
+    req.body['pagination'] = {page:page,maxRows:maxRows,offset:page+1,count:count};
     return comments;
   }
 
   @Get(':id')
-  @UseGuards(ValidatePostAndComment)
+  @UseGuards(ValidatePostAndComment) 
   async findOne(
     @Req() request
   ): Promise<CommentDto> {

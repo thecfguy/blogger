@@ -9,6 +9,7 @@ import {
   Req,
   ParseIntPipe,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AlbumsService } from './albums.service';
 import { AlbumDto } from './dto/album.dto';
@@ -17,7 +18,10 @@ import { GetUser } from '@app/common/decorator/getUser.decorator';
 import { User } from '@app/users/entities/user.entity';
 import { AlbumFindDto } from './dto/album-find.dto';
 import { ValidateAlbum } from './guard/validateAlbum.guard';
-// @UseGuards(JwtAuthGuard)
+import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
+import { ResponseValidationInterceptor } from '@app/common/interceptor/response-validate.interceptor';
+@UseGuards(JwtAuthGuard)
+@UseInterceptors( new ResponseValidationInterceptor(AlbumDto))
 @Controller('albums')
 export class AlbumsController {
   constructor(private readonly albumsService: AlbumsService) {}

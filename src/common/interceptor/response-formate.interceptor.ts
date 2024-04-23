@@ -13,17 +13,23 @@ import { map } from 'rxjs/operators';
 @Injectable()
 export class ResponseFormateInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const ctx = context.switchToHttp();
+    const req = ctx.getRequest();
+
     return next.handle().pipe(
       map((data) => {     
         
-        if (data) {         
-          return {
-            error: false,
-            value: data,
-            message: [],
-          };
+        const res = {
+          error: false,
+          value: data,
+          message: [],
+        };
+ 
+        if(req?.body && req.body?.pagination){
+          res['pagination'] = req.body.pagination;
         }
-        throw new BadRequestException('Invalid response format');
+        return res;
+       
       }),
     );
   }
