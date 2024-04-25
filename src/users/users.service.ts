@@ -14,6 +14,10 @@ export class UsersService {
     user.name = createUserDto.name;
     user.username = createUserDto.username;
     user.email = createUserDto.email;
+    user.password = createUserDto.password;
+    if (createUserDto?.role) {
+      user.role = createUserDto.role;
+    }
     if (createUserDto.address) {
       user.street = createUserDto.address.street;
       user.suite = createUserDto.address.suite;
@@ -29,26 +33,29 @@ export class UsersService {
       user.companyCatchPhrase = createUserDto.company.catchPhrase;
       user.companyBs = createUserDto.company.bs;
     }
+
     return user;
   }
 
   mapUserEntityToDto(user: User): UserDto {
     const createUserDto = new UserDto();
+
     createUserDto.id = user.id;
     createUserDto.name = user.name;
     createUserDto.username = user.username;
     createUserDto.email = user.email;
     createUserDto.password = user.password;
-    createUserDto.address = {
-      street: user.street,
-      suite: user.suite,
-      city: user.city,
-      zipcode: user.zipcode,
-      geo: {
-        lat: user.lat,
-        lng: user.lng,
-      },
-    };
+    (createUserDto.role = user.role),
+      (createUserDto.address = {
+        street: user.street,
+        suite: user.suite,
+        city: user.city,
+        zipcode: user.zipcode,
+        geo: {
+          lat: user.lat,
+          lng: user.lng,
+        },
+      });
     createUserDto.phone = user.phone;
     createUserDto.website = user.website;
     createUserDto.company = {
@@ -59,7 +66,7 @@ export class UsersService {
     return createUserDto;
   }
 
-  async create(createUserDto: UserDto): Promise<UserDto> {
+  async create(createUserDto: UserDto) {
     const user = this.repo.create(this.mapUserDtoToEntity(createUserDto));
     return this.mapUserEntityToDto(await this.repo.save(user)) as UserDto;
   }
@@ -87,6 +94,13 @@ export class UsersService {
     return this.mapUserEntityToDto(
       await this.repo.save(user, { reload: true }),
     );
+  }
+
+  async findByUsername(userName: string) {
+    const user = await this.repo.findOne({
+      where: { username: userName },
+    }); /*  */
+    return user;
   }
 
   remove(id: number) {

@@ -6,41 +6,76 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
+  NotFoundException,
+  UseGuards,
+  Req,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PhotosService } from './photos.service';
 import { PhotoDto } from './dto/photo.dto';
 import { UpdatePhotoDto } from './dto/update-photo.dto';
-
+import { AlbumsService } from '../albums.service';
+import { AlbumDto } from '../dto/album.dto';
+import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
+import { PhotoFindDto } from './dto/photo-find.dto';
+import { ValidateAlbumAndPhoto } from './guard/validateAlbumAndPhoto.guard';
+import { ResponseValidationInterceptor } from '@app/common/interceptor/response-validate.interceptor';
+@UseGuards(JwtAuthGuard)
+@UseInterceptors( new ResponseValidationInterceptor(PhotoDto))
 @Controller('albums/:albumId/photos')
 export class PhotosController {
-  constructor(private readonly photosService: PhotosService) {}
+  constructor(
+    private readonly photosService: PhotosService,
+    private albumService: AlbumsService,
+  ) {}
 
   @Post()
-  create(@Param('albumId') albumId: string, @Body() createPhotoDto: PhotoDto) {
-    return this.photosService.create(createPhotoDto);
+  async create(
+    @Param('albumId', ParseIntPipe) albumId: number,
+    @Body() createPhotoDto: PhotoDto,
+  ):Promise<PhotoDto> {
+    const album = await this.photosService.create({
+      ...createPhotoDto,
+      album: { id: albumId } as AlbumDto,
+    });
+    return album;
   }
 
-  @Get()
-  findAll(@Param('albumId') albumId: string) {
-    return this.photosService.findAll({ albumId });
+  @Post('list')
+  async findAll(
+    @Param('albumId', ParseIntPipe) albumId: number,
+    @Body() queryDto: PhotoFindDto,
+  ):Promise<PhotoDto[]> {
+    const { filter, pagination, sort } = queryDto;
+    const modifiedFilter: any = { album: { id: albumId }, ...filter };
+    return this.photosService.findAll({
+      filter: modifiedFilter,
+      pagination,
+      sort,
+    });
   }
 
   @Get(':id')
-  findOne(@Param('albumId') albumId: string, @Param('id') id: string) {
-    return this.photosService.findOne(+albumId, +id);
+  @UseGuards(ValidateAlbumAndPhoto)
+  async findOne(@Req() request):Promise<PhotoDto> {
+    const albumPhoto = request.photo;
+    return albumPhoto;
   }
 
   @Patch(':id')
-  update(
-    @Param('albumId') albumId: string,
-    @Param('id') id: string,
+  @UseGuards(ValidateAlbumAndPhoto)
+  async update(
+    @Param('albumId', ParseIntPipe) albumId: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updatePhotoDto: UpdatePhotoDto,
-  ) {
-    return this.photosService.update(albumId, +id, updatePhotoDto);
+  ):Promise<PhotoDto> {
+    return await this.photosService.update(albumId, id, updatePhotoDto);
   }
 
   @Delete(':id')
-  remove(@Param('albumId') albumId: string, @Param('id') id: string) {
-    return this.photosService.remove(+id);
+  @UseGuards(ValidateAlbumAndPhoto)
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return await this.photosService.remove(+id);
   }
 }

@@ -6,38 +6,64 @@ import {
   Patch,
   Param,
   Delete,
-  Query,
+  UseGuards,
+  ParseIntPipe,
+  Req,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostDto } from './dto/post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { GetUser } from '@app/common/decorator/getUser.decorator';
+import { User } from '@app/users/entities/user.entity';
+import { PostFindDto } from './dto/post-find.dto';
+import { ValidatePost } from './guard/ValidatePost.guard';
+import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
+import { ResponseValidationInterceptor } from '@app/common/interceptor/response-validate.interceptor';
 
+@UseGuards(JwtAuthGuard)
+@UseInterceptors(new ResponseValidationInterceptor(PostDto))
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
-  create(@Body() createPostDto: PostDto) {
-    return this.postsService.create(createPostDto);
+  async create(
+    @Body() createPostDto: PostDto,
+    @GetUser() loginUser: User,
+  ): Promise<PostDto> {
+    return await this.postsService.create({
+      ...createPostDto,
+      user: loginUser,
+    });
   }
 
-  @Get()
-  findAll(@Query('page') page: number, @Query('maxRows') maxRows: number) {
-    return this.postsService.findAll({ pagination: { page, maxRows } });
+  @Post('list')
+  async findAll(@Body() queryDto: PostFindDto): Promise<PostDto[]> {
+    const { filter, pagination, sort } = queryDto;
+    return await this.postsService.findAll({ filter, pagination, sort });
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.postsService.findOne({ id });
+  @UseGuards(ValidatePost)
+  async findOne(@Req() request): Promise<PostDto> {
+    const post = request.post;
+    return post;
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postsService.update(+id, updatePostDto);
+  @UseGuards(ValidatePost)
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updatePostDto: UpdatePostDto,
+  ): Promise<PostDto> {
+    //TODO: We should latest full post object
+    return await this.postsService.update(id, updatePostDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postsService.remove(+id);
+  @UseGuards(ValidatePost)
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return await this.postsService.remove(id);
   }
 }
