@@ -14,12 +14,14 @@ export class Album {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 255,nullable: false })
+  @Column({ length: 255, nullable: false })
   title: string;
 
   @ManyToOne(() => User, (user) => user.albums)
   user: User;
 
-  @OneToMany(() => Photo, (photo) => photo.album)
+  @OneToMany(() => Photo, (photo) => photo.album, {
+    onDelete: 'CASCADE',
+  })
   photos: Photo[];
 }

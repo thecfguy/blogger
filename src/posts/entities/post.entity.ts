@@ -13,15 +13,17 @@ export class Post {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({length: 255, nullable: false })
+  @Column({ length: 255, nullable: false })
   title: string;
 
-  @Column({length: 255, nullable: false })
+  @Column({ length: 255, nullable: false })
   body: string;
 
   @ManyToOne(() => User, (user) => user.posts)
   user: User;
 
-  @OneToMany(() => Comment, (comment) => comment.post)
+  @OneToMany(() => Comment, (comment) => comment.post, {
+    onDelete: 'CASCADE',
+  })
   comments: Comment[];
 }
