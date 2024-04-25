@@ -29,7 +29,6 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
-    // @UseInterceptors(PostResponseInterceptor)
   async create(@Body() createPostDto: PostDto, @GetUser() loginUser: User):Promise<PostDto> {
     return await this.postsService.create({
       ...createPostDto,

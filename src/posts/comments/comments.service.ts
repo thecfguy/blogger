@@ -34,7 +34,7 @@ export class CommentsService {
       where.id = In(where.id);
     }
     //Sort Logic
-    const order = sortTransform(sort);    
+    const order = sortTransform(sort);
      
     const comments= await this.repo.find({
       take,

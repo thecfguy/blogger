@@ -62,7 +62,7 @@ export class CommentsController {
     return comments;
   }
 
-  @Get(':id')
+  @Get(':id') 
   @UseGuards(ValidatePostAndComment) 
   async findOne(
     @Req() request

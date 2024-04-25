@@ -28,8 +28,7 @@ export class ResponseFormateInterceptor implements NestInterceptor {
         if(req?.body && req.body?.pagination){
           res['pagination'] = req.body.pagination;
         }
-        return res;
-       
+        return res;       
       }),
     );
   }

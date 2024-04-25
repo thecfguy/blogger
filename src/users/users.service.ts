@@ -14,6 +14,10 @@ export class UsersService {
     user.name = createUserDto.name;
     user.username = createUserDto.username;
     user.email = createUserDto.email;
+    user.password = createUserDto.password;
+    if(createUserDto?.role){
+      user.role= createUserDto.role
+    }    
     if (createUserDto.address) {
       user.street = createUserDto.address.street;
       user.suite = createUserDto.address.suite;
@@ -29,16 +33,19 @@ export class UsersService {
       user.companyCatchPhrase = createUserDto.company.catchPhrase;
       user.companyBs = createUserDto.company.bs;
     }
+    
     return user;
   }
 
   mapUserEntityToDto(user: User): UserDto {
     const createUserDto = new UserDto();
+  
     createUserDto.id = user.id;
     createUserDto.name = user.name;
     createUserDto.username = user.username;
     createUserDto.email = user.email;
     createUserDto.password = user.password;
+    createUserDto.role= user.role,
     createUserDto.address = {
       street: user.street,
       suite: user.suite,
@@ -59,9 +66,11 @@ export class UsersService {
     return createUserDto;
   }
 
-  async create(createUserDto: UserDto): Promise<UserDto> {
+  async create(createUserDto: UserDto) {
+    
     const user = this.repo.create(this.mapUserDtoToEntity(createUserDto));
-    return this.mapUserEntityToDto(await this.repo.save(user)) as UserDto;
+    return  this.mapUserEntityToDto(await this.repo.save(user)) as UserDto;
+    
   }
 
   async findAll(filter?: unknown | null): Promise<UserDto[]> {
@@ -69,6 +78,7 @@ export class UsersService {
       where: filter,
     });
     return users.map((user) => this.mapUserEntityToDto(user));
+
   }
 
   async findOne(id: number): Promise<UserDto> {
@@ -91,7 +101,7 @@ export class UsersService {
 
   async findByUsername(userName: string) {
     const user = await this.repo.findOne({ where: { username: userName } });
-
+     console.log('step2')
     return user;
   }
 
