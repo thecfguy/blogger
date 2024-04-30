@@ -15,6 +15,9 @@ export class Photo {
   @Column({length: 255, nullable: false })
   thumbnailUrl: string;
 
-  @ManyToOne(() => Album, (album) => album.photos, {cascade:true})
+  @ManyToOne(() => Album, (album) => album.photos, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   album: Album;
 }

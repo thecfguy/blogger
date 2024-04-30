@@ -1,5 +1,7 @@
-import { Expose, Type } from 'class-transformer';
+import { CreateGroupDto } from '@app/group/dto/create-group.dto';
+import { Exclude, Expose, Type } from 'class-transformer';
 import {
+  IsArray,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -27,8 +29,10 @@ class AddressDto {
 class CompanyDto {
   name: string;
   catchPhrase: string;
+ 
   bs: string;
 }
+@Exclude()
 export class UserDto {
   @IsOptional()
   @Expose()
@@ -44,6 +48,7 @@ export class UserDto {
   @Expose()
   username: string;
 
+ @Expose()
   @IsNotEmpty()
   @IsString()
   password: string;
@@ -76,4 +81,8 @@ export class UserDto {
   @Type(() => AddressDto)
   @Expose()
   company: CompanyDto;
+   
+  @IsOptional()
+  @IsArray()
+  groups: CreateGroupDto[]
 }

@@ -3,10 +3,12 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { plainToClass } from 'class-transformer';
+import { validate } from 'class-validator';
 
 @Injectable()
 export class ResponseValidationInterceptor<T> implements NestInterceptor {
@@ -14,9 +16,18 @@ export class ResponseValidationInterceptor<T> implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
-      map((data) => {
+      map(async (data) => {
         if (Array.isArray(data)) {
-          return data?.map((item) => plainToClass(this.dtoClass, item));
+          const transformedData =data?.map((item)=> plainToClass(this.dtoClass,item))
+          const errors = await validate(transformedData);
+
+        if (errors.length > 0) {
+          throw new InternalServerErrorException({
+            message: 'Response validation failed',
+            errors,
+          });
+        }
+        return transformedData;
         } else {
           return plainToClass(this.dtoClass, data);
         }

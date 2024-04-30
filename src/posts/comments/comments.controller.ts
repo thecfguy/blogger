@@ -20,6 +20,8 @@ import { CommentFindDto } from './dto/comment-find.dto';
 import { ValidatePostAndComment } from './guard/ValidatePostAndComment.guard';
 import { ResponseValidationInterceptor } from '../../common/interceptor/response-validate.interceptor';
 import { PaginationDto } from '@app/common/dto/pagination.dto';
+import { Permission } from '@app/common/decorator/permissions.decorator';
+import { PermissionGuard } from '@app/common/guard/permission.guard';
 
 
 

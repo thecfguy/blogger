@@ -1,6 +1,7 @@
 import { IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Expose, Transform, Type } from 'class-transformer';
-import { UserDto } from '@app/users/dto/user.dto';
+import { UserMiniDto } from '@app/users/dto/user-mini.dto';
+
 
 export class PostDto {
   @IsOptional()
@@ -19,8 +20,8 @@ export class PostDto {
   body: string;
 
   @IsNotEmpty()
- @ValidateNested()
-  @Type(() => UserDto)
-  @Expose() 
-  user: Partial<UserDto>;
+  @ValidateNested()
+  @Type(() => UserMiniDto)
+  @Expose()
+  user: UserMiniDto;
 }

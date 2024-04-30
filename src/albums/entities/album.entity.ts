@@ -20,6 +20,8 @@ export class Album {
   @ManyToOne(() => User, (user) => user.albums)
   user: User;
 
-  @OneToMany(() => Photo, (photo) => photo.album)
+  @OneToMany(() => Photo, (photo) => photo.album,{
+    onDelete: 'CASCADE',
+  })
   photos: Photo[];
 }

@@ -1,8 +1,9 @@
 import { Todo } from '@app/todos/entities/todo.entity';
 import { Post } from '@app/posts/entities/post.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany ,BeforeInsert, Unique } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany ,BeforeInsert, Unique, JoinTable, ManyToMany } from 'typeorm';
 import { Album } from '@app/albums/entities/album.entity';
 import { Role } from '../dto/user.dto';
+import { Group } from '@app/group/entities/group.entity';
 
 
 @Entity({ name: 'users' })
@@ -66,6 +67,15 @@ export class User {
 
   @OneToMany(() => Album, (album) => album.user,{cascade:true})
   albums: Album[];
+
+  @ManyToMany(() => Group, group => group.users)
+  @JoinTable({name:'users_groups_link',joinColumn: {
+     name: 'userId', 
+  },
+  inverseJoinColumn: {
+       name: 'groupId', 
+  },})
+  groups: Group[];
 
 
   @BeforeInsert()

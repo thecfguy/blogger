@@ -9,6 +9,8 @@ import { ConfigModule } from '@app/common/config/config.module';
 import { DatabaseModule } from './common/database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { ResponseFormateInterceptor } from './common/interceptor/response-formate.interceptor';
+import { GroupModule } from './group/group.module';
+
 @Module({
   imports: [
     UsersModule,
@@ -18,6 +20,7 @@ import { ResponseFormateInterceptor } from './common/interceptor/response-format
     ConfigModule,
     DatabaseModule,
     AuthModule,
+    GroupModule,   
   ],
   controllers: [AppController],
   providers: [AppService,
