@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { ResponseFormateInterceptor } from './common/interceptor/response-formate.interceptor';
 import { GroupModule } from './group/group.module';
 
+
 @Module({
   imports: [
     UsersModule,
@@ -20,7 +21,7 @@ import { GroupModule } from './group/group.module';
     ConfigModule,
     DatabaseModule,
     AuthModule,
-    GroupModule,   
+    GroupModule,       
   ],
   controllers: [AppController],
   providers: [AppService,

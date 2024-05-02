@@ -8,7 +8,7 @@ import { User } from '@app/users/entities/user.entity';
 import { GroupFilterDto } from './dto/group-filter.dto';
 import { GroupFindDto } from './dto/group-find.dto';
 import { sortTransform } from '@app/common/service/sort-transform';
-import { Permission } from './entities/permission.entity';
+import { Permissions } from './entities/permission.entity';
 import { CreatePermissionDto } from './dto/create-group.dto';
 
 @Injectable()
@@ -16,17 +16,17 @@ export class GroupService {
   constructor(
     @InjectRepository(Group)
     private group: Repository<Group>,
-    @InjectRepository(Permission)
-    private permission: Repository<Permission>,
+    @InjectRepository(Permissions)
+    private permission: Repository<Permissions>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
   async create(groupDto: CreateGroupDto): Promise<Group> {
     const group = new Group();
     group.name = groupDto.name;
-    const permissions: Permission[] = await Promise.all(
+    const permissions: Permissions[] = await Promise.all(
       groupDto.permissions.map(async (permissionDto) => {
-        const permission = new Permission();
+        const permission = new Permissions();
         permission.module = permissionDto.module;
         permission.access = permissionDto.access;
         permission.ownership = permissionDto.ownership;
@@ -34,7 +34,7 @@ export class GroupService {
       }),
     );
 
-    group.permission = permissions;
+    group.permissions = permissions;
     return this.group.save(group);
   }
 
@@ -63,11 +63,11 @@ export class GroupService {
       skip,
       where,
       order,
-      relations: ['permission', 'users'],
+      relations: ['permissions', 'users'],
       select: {
         id: true,
         name: true,
-        permission: {
+        permissions: {
           id: true,
           access: true,
           ownership: true,
@@ -89,11 +89,11 @@ export class GroupService {
     }
     const group = await this.group.findOne({
       where: modifiedFilter,
-      relations: ['permission', 'users'],
+      relations: ['permissions', 'users'],
       select: {
         id: true,
         name: true,
-        permission: {
+        permissions: {
           id: true,
           access: true,
           ownership: true,
@@ -107,6 +107,7 @@ export class GroupService {
     });
     return group;
   }
+  
   async update(groupId: number, createGroupDto: UpdateGroupDto) {
     const group = await this.findOne({ id: groupId });
     group.name = createGroupDto.name;
@@ -118,7 +119,7 @@ export class GroupService {
 
     // filter out permissions to delete
     if (createGroupDto.permissions.length === 0) {
-      group.permission = [];
+      group.permissions = [];
     } else {
       // filter out permissions to delete
       const permissionsToDelete = existingPermissions.filter(
@@ -132,7 +133,7 @@ export class GroupService {
       await this.permission.remove(permissionsToDelete);
 
       // create or update permissions
-      const newPermissions: Permission[] = await Promise.all(
+      const newPermissions: Permissions[] = await Promise.all(
         createGroupDto.permissions.map(async (permissionDto) => {
           if (permissionDto.id) {
             // If permission ID is provided, try to find the existing permission
@@ -150,7 +151,7 @@ export class GroupService {
             }
           } else {
             // No permission ID provided, create a new permission
-            const newPermission = new Permission();
+            const newPermission = new Permissions();
             newPermission.module = permissionDto.module;
             newPermission.access = permissionDto.access;
             newPermission.ownership = permissionDto.ownership;
@@ -159,7 +160,7 @@ export class GroupService {
         }),
       );
       // Update group permissions
-      group.permission = newPermissions;
+      group.permissions = newPermissions;
     }
     return this.group.save(group);
   }

@@ -22,8 +22,9 @@ import { PhotoFindDto } from './dto/photo-find.dto';
 import { ValidateAlbumAndPhoto } from './guard/validateAlbumAndPhoto.guard';
 import { ResponseValidationInterceptor } from '@app/common/interceptor/response-validate.interceptor';
 import { Permission } from '@app/common/decorator/permissions.decorator';
-import { PermissionGuard } from '@app/common/guard/permission.guard';
-@UseGuards(JwtAuthGuard,PermissionGuard)
+import { Action } from '@app/common/constants/action';
+import { Posts } from '@app/posts/entities/post.entity';
+@UseGuards(JwtAuthGuard)
 @UseInterceptors( new ResponseValidationInterceptor(PhotoDto))
 @Controller('albums/:albumId/photos')
 export class PhotosController {
@@ -59,10 +60,9 @@ export class PhotosController {
   }
 
   @Get(':id')
-  @Permission({ access: 'READ', ownership: 'OWN', module: 'PHOTO' })
   @UseGuards(ValidateAlbumAndPhoto)
   async findOne(@Req() request):Promise<PhotoDto> {
-      const albumPhoto = request.photo;
+    const albumPhoto = request.photo;   
     return albumPhoto;
   }
 

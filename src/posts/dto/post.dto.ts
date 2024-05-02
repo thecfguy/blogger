@@ -19,7 +19,7 @@ export class PostDto {
   @Expose() 
   body: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @ValidateNested()
   @Type(() => UserMiniDto)
   @Expose()

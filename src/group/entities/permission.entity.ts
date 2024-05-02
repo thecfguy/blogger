@@ -2,7 +2,7 @@ import { Group } from '@app/group/entities/group.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('permission')
-export class Permission {
+export class Permissions {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -15,7 +15,7 @@ export class Permission {
   @Column({ length: 255, nullable: false })
   ownership: string;
 
-  @ManyToOne(() => Group, (group) => group.permission, {
+  @ManyToOne(() => Group, (group) => group.permissions, {
     onDelete: 'CASCADE',
   })
   group: Group;

@@ -1,4 +1,4 @@
-import { Post } from '@app/posts/entities/post.entity';
+import {  Posts } from '@app/posts/entities/post.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique } from 'typeorm';
 
 @Entity({ name: 'comments' })
@@ -15,9 +15,13 @@ export class Comment {
   @Column({ nullable: false }) 
   body: string;
 
-  @ManyToOne(() => Post, (post) => post.comments, {
+  @ManyToOne(() => Posts, (post) => post.comments , {
     cascade: true,
     onDelete: 'CASCADE',
   })
-  post: Post;
+  post: Posts;
+
+  constructor(comment: Partial<Comment>) {
+    Object.assign(this,comment)
+  }
 }

@@ -1,6 +1,6 @@
-import { SortDto } from "../dto/sort.dto";
 
-export function sortTransform(sort: SortDto[] | undefined) {
+
+export function sortTransform(sort) {
   const order = {};
   if (sort) {
     sort.forEach((item) => {

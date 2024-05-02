@@ -6,10 +6,11 @@ import { Album } from '../entities/album.entity';
 import { Photo } from './entities/photo.entity';
 import { AlbumsService } from '../albums.service';
 import { UsersModule } from '@app/users/users.module';
+import { AbilityModule } from '@app/casl/casl.module';
 
 @Module({
   controllers: [PhotosController],
   providers: [PhotosService,AlbumsService],
-  imports: [TypeOrmModule.forFeature([Album, Photo]),UsersModule],
+  imports: [TypeOrmModule.forFeature([Album, Photo]),UsersModule,AbilityModule],
 })
 export class PhotosModule {}

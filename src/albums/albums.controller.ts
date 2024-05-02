@@ -43,7 +43,7 @@ export class AlbumsController {
   @Get(':id')
   @UseGuards(ValidateAlbum)
   async findOne(@Req() request):Promise<AlbumDto> {
-    const album = request.album;
+    const album = await request.album;
     return album;
   }
 

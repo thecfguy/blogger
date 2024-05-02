@@ -3,21 +3,21 @@ import { PostDto } from './dto/post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Post } from './entities/post.entity';
+import { Posts } from './entities/post.entity';
 import { PostFilterDto } from './dto/post-filter.dto';
 import { PostFindDto } from './dto/post-find.dto';
 import { sortTransform } from '@app/common/service/sort-transform';
 
 @Injectable()
 export class PostsService {
-  constructor(@InjectRepository(Post) private repo: Repository<Post>) {}
+  constructor(@InjectRepository(Posts) private repo: Repository<Posts>) {}
 
-  async create(createPostDto: PostDto): Promise<Post> {
+  async create(createPostDto: PostDto): Promise<Posts> {
     const post = await this.repo.create(createPostDto);
     return this.repo.save(post);
   }
 
-  findAll({ filter, pagination, sort }: PostFindDto): Promise<Post[]> {
+  findAll({ filter, pagination, sort }: PostFindDto): Promise<Posts[]> {
     //Pagination Logic
     const { page, maxRows } = pagination;
     const skip = ((page - 1) * maxRows) | 0;
@@ -52,7 +52,7 @@ export class PostsService {
     });
   }
 
-  async findOne(filter: PostFilterDto): Promise<Post> {
+  async findOne(filter: PostFilterDto): Promise<Posts> {
     const modifiedFilter: any = {};
     if (typeof filter.id === 'number') {
       modifiedFilter.id = filter.id;

@@ -18,18 +18,21 @@ export class ResponseValidationInterceptor<T> implements NestInterceptor {
     return next.handle().pipe(
       map(async (data) => {
         if (Array.isArray(data)) {
-          const transformedData =data?.map((item)=> plainToClass(this.dtoClass,item))
+          const transformedData = data?.map((item) =>
+            plainToClass(this.dtoClass, item),
+          );
           const errors = await validate(transformedData);
 
-        if (errors.length > 0) {
-          throw new InternalServerErrorException({
-            message: 'Response validation failed',
-            errors,
-          });
-        }
-        return transformedData;
+          if (errors.length > 0) {
+            throw new InternalServerErrorException({
+              message: 'Response validation failed',
+              errors,
+            });
+          }
+          return transformedData;
         } else {
-          return plainToClass(this.dtoClass, data);
+          const transformedData = plainToClass(this.dtoClass, data);
+          return transformedData;
         }
       }),
     );

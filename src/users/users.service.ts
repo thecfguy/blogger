@@ -1,11 +1,11 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {Injectable } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Group } from '@app/group/entities/group.entity';
-import { GroupService } from '@app/group/group.service';
+
 import {
   CreateGroupDto,
   CreatePermissionDto,
@@ -45,7 +45,6 @@ export class UsersService {
 
   mapUserEntityToDto(user: User): UserDto {
     const createUserDto = new UserDto();
-    console.log('called');
     createUserDto.id = user.id;
     createUserDto.name = user.name;
     createUserDto.username = user.username;
@@ -73,7 +72,7 @@ export class UsersService {
       const groupDto = new CreateGroupDto();
       groupDto.id = group?.id;
       groupDto.name = group?.name;
-      groupDto.permissions = group?.permission?.map((permission) => {
+      groupDto.permissions = group?.permissions?.map((permission) => {
         const permissionDto = new CreatePermissionDto();
         permissionDto.id = permission?.id;
         permissionDto.module = permission?.module;
@@ -100,7 +99,7 @@ export class UsersService {
         groups: {
           id: true,
           name: true,
-          permission: true,
+          permissions: true,
         },
       },
     });
@@ -111,22 +110,31 @@ export class UsersService {
     return this.mapUserEntityToDto(
       await this.repo.findOne({
         where: { id: id },
-        relations: ['groups', 'groups.permission'],
+        relations: ['groups', 'groups.permissions'],
         select: {
           groups: {
             id: true,
             name: true,
-            permission: true,
+            permissions: true,
           },
         },
-      }),
+      })
     ) as UserDto;
   }
   async update(id: number, updateUserDto: UpdateUserDto) {
+    console.log('updateUserDto',updateUserDto)
     const user = await this.repo.findOneBy({ id });
     if (!user) {
       return null;
     }
+    if(updateUserDto.username){
+      user.username=updateUserDto.username
+    }
+    if(updateUserDto.email){
+      user.email=updateUserDto.email
+    }
+   
+   
     if (updateUserDto.groups && updateUserDto.groups.length > 0) {
       user.groups = updateUserDto.groups.map(
         (group) => ({ id: group.id }) as Group,
@@ -134,6 +142,7 @@ export class UsersService {
     } else {
       user.groups = [];
     }
+    
     return this.repo.save(user);
   }
 

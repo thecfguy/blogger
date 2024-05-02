@@ -24,7 +24,8 @@ import { PhotosService } from '../photos.service';
   
       if (!album) {
         throw new NotFoundException(`Album not found`);
-      }
+      } 
+     
   
       const photo = await this.photosService.findOne({
         id: photoId,
@@ -34,9 +35,10 @@ import { PhotosService } from '../photos.service';
       if (!photo) {
         throw new NotFoundException(`Photo Not Found`);
       }
+    
       request.album = album;
       request.photo = photo;
-  
+      
       return true;
     }
   }

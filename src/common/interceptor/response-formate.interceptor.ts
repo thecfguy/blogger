@@ -17,11 +17,11 @@ export class ResponseFormateInterceptor implements NestInterceptor {
     const req = ctx.getRequest();
 
     return next.handle().pipe(
-      map((data) => {     
+      map(async(data) => {     
         
         const res = {
           error: false,
-          value: data,
+          value: await data,
           message: [],
         };
  

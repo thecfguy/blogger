@@ -16,17 +16,12 @@ import { UsersService } from './users.service';
 import { UserDto } from './dto/user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
-import { Roles } from '@app/common/decorator/roles.decorator';
-import { RoleGuard } from '@app/common/guard/role.guard';
-import { Permission } from '@app/common/decorator/permissions.decorator';
-import { PermissionGuard } from '@app/common/guard/permission.guard';
 
-@Controller('users')
+
 @UseGuards(JwtAuthGuard)
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-  // @Roles('user')
-  // @UseGuards(RoleGuard)
   @Post()
   @UseInterceptors(ClassSerializerInterceptor)
   async create(@Body() createUserDto: UserDto) {

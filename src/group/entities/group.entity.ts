@@ -7,7 +7,7 @@ import {
   JoinTable,
   OneToMany,
 } from 'typeorm';
-import { Permission } from './permission.entity';
+import { Permissions } from './permission.entity';
 
 @Entity('group')
 export class Group {
@@ -17,12 +17,14 @@ export class Group {
   @Column({ nullable: false, unique: true })
   name: string;
 
-  @OneToMany(() => Permission, (permission) => permission.group, {
+  @OneToMany(() => Permissions, (permission) => permission.group, {
     cascade: true,
     onDelete: 'CASCADE',
   })
-  permission: Permission[];
+  permissions: Permissions[];
 
   @ManyToMany(() => User, (user) => user.groups)
   users?: User[];
 }
+
+

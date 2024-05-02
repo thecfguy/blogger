@@ -9,7 +9,7 @@ import {
 import { Comment } from '../comments/entities/comment.entity';
 
 @Entity({ name: 'posts' })
-export class Post {
+export class Posts {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -26,4 +26,9 @@ export class Post {
     onDelete: 'CASCADE',
   })
   comments: Comment[];
+
+  constructor(posts: Partial<Posts>) {
+    Object.assign(this,posts)
+  }
+
 }
