@@ -9,19 +9,26 @@ import {
 import { Comment } from '../comments/entities/comment.entity';
 
 @Entity({ name: 'posts' })
-export class Post {
+export class Posts {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
+  @Column({length: 255, nullable: false })
   title: string;
 
-  @Column({ nullable: false })
+  @Column({length: 255, nullable: false })
   body: string;
 
   @ManyToOne(() => User, (user) => user.posts)
   user: User;
 
-  @OneToMany(() => Comment, (comment) => comment.post)
+  @OneToMany(() => Comment, (comment) => comment.post,{
+    onDelete: 'CASCADE',
+  })
   comments: Comment[];
+
+  constructor(posts: Partial<Posts>) {
+    Object.assign(this,posts)
+  }
+
 }

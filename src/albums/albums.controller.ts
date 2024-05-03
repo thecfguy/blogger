@@ -6,8 +6,10 @@ import {
   Patch,
   Param,
   Delete,
-  //ParseIntPipe,
-  NotFoundException,
+  Req,
+  ParseIntPipe,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AlbumsService } from './albums.service';
 import { AlbumDto } from './dto/album.dto';
@@ -15,13 +17,17 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 import { GetUser } from '@app/common/decorator/getUser.decorator';
 import { User } from '@app/users/entities/user.entity';
 import { AlbumFindDto } from './dto/album-find.dto';
-// @UseGuards(JwtAuthGuard)
+import { ValidateAlbum } from './guard/validateAlbum.guard';
+import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
+import { ResponseValidationInterceptor } from '@app/common/interceptor/response-validate.interceptor';
+@UseGuards(JwtAuthGuard)
+@UseInterceptors( new ResponseValidationInterceptor(AlbumDto))
 @Controller('albums')
 export class AlbumsController {
   constructor(private readonly albumsService: AlbumsService) {}
 
   @Post()
-  async create(@Body() createAlbumDto: AlbumDto, @GetUser() loginUser: User) {
+  async create(@Body() createAlbumDto: AlbumDto, @GetUser() loginUser: User):Promise<AlbumDto> {
     return await this.albumsService.create({
       ...createAlbumDto,
       user: loginUser,
@@ -29,37 +35,32 @@ export class AlbumsController {
   }
 
   @Post('list')
-  async findAll(@Body() queryDto: AlbumFindDto) {
+  async findAll(@Body() queryDto: AlbumFindDto):Promise<AlbumDto[]> {
     const { filter, pagination, sort } = queryDto;
-
     return await this.albumsService.findAll({ filter, pagination, sort });
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number) {
-    console.log(id);
-    const album = await this.albumsService.findOne({ id: id });
-    if (!album) {
-      throw new NotFoundException('Album not found');
-    }
+  @UseGuards(ValidateAlbum)
+  async findOne(@Req() request):Promise<AlbumDto> {
+    const album = await request.album;
     return album;
   }
 
   @Patch(':id')
-  async update(id: number, @Body() updateAlbumDto: UpdateAlbumDto) {
-    const album = await this.albumsService.findOne({ id: id });
-    if (!album) {
-      throw new NotFoundException('Album not found');
-    }
-    return await this.albumsService.update(+id, updateAlbumDto);
+  @UseGuards(ValidateAlbum)
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateAlbumDto: UpdateAlbumDto,
+    @Req() request,
+  ):Promise<AlbumDto> {
+    const album = request.album;
+    return await this.albumsService.update(+id, updateAlbumDto, album);
   }
 
   @Delete(':id')
+  @UseGuards(ValidateAlbum)
   async remove(@Param('id') id: number) {
-    const album = await this.albumsService.findOne({ id: id });
-    if (!album) {
-      throw new NotFoundException('Album not found');
-    }
     return await this.albumsService.remove(+id);
   }
 }

@@ -1,14 +1,14 @@
 import { PaginationDto } from "@app/common/dto/pagination.dto";
-import { CommentFilterDto } from "./comment-filter.dto";
-import { CommentSortDto } from "./comment-sort.dto";
+import { PhotoFilterDto } from "./photo-filter.dto";
+import { PhotoSortDto } from "./photo-sort.dto";
 import { IsOptional, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
-export class CommentfindAllBodyDto {
+export class PhotoFindDto {
   @IsOptional()
   @ValidateNested()
-  @Type(() => CommentFilterDto)
-  filter?: CommentFilterDto;
+  @Type(() => PhotoFilterDto)
+  filter?: PhotoFilterDto;
 
   @IsOptional()
   @ValidateNested()
@@ -17,6 +17,6 @@ export class CommentfindAllBodyDto {
 
   @IsOptional()
   @ValidateNested({ each: true })
-  @Type(() => CommentSortDto)
-  sort?: CommentSortDto[];
+  @Type(() => PhotoSortDto)
+  sort?: PhotoSortDto[];
 }

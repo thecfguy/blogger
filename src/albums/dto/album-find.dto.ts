@@ -13,7 +13,7 @@ export class AlbumFindDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => PaginationDto)
-  pagination?: PaginationDto;
+  pagination?: PaginationDto = { page: 1, maxRows: 50 };
 
   @IsOptional()
   @ValidateNested({ each: true })

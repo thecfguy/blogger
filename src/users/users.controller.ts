@@ -9,21 +9,31 @@ import {
   ClassSerializerInterceptor,
   UseInterceptors,
   UseGuards,
+  ConflictException,
+  NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserDto } from './dto/user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 
-@Controller('users')
+
 @UseGuards(JwtAuthGuard)
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
   @Post()
   @UseInterceptors(ClassSerializerInterceptor)
-  create(@Body() createUserDto: UserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: UserDto) {
+    try {
+      return await this.usersService.create(createUserDto);
+    } catch (error) {
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new ConflictException('username and email must be unique');
+      } else {
+        throw error;
+      }
+    }
   }
 
   @Get()
@@ -37,8 +47,19 @@ export class UsersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    try {
+      const updatedGroup = await this.usersService.update(+id, updateUserDto);
+      return updatedGroup;
+    } catch (error) {
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new ConflictException('Email and username must be unique');
+      } else if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+        throw new NotFoundException('group not exist');
+      } else {
+        throw error;
+      }
+    }
   }
 
   @Delete(':id')

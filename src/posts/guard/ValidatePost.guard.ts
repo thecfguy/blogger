@@ -12,11 +12,12 @@ export class ValidatePost implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const postId = +request.params?.postId;
-
+    const postId = +request.params?.id;
+      
     // add both service post and comment and also user
+   
     const post = await this.postService.findOne({ id: postId });
-
+   
     if (!post) {
       throw new NotFoundException(`Post not found`);
     }

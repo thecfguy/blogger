@@ -4,47 +4,39 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
-import { PaginationDto } from '@app/common/dto/pagination.dto';
 import { CommentFilterDto } from './dto/comment-filter.dto';
-import { CommentSortDto } from './dto/comment-sort.dto';
+import { CommentFindDto } from './dto/comment-find.dto';
+import { sortTransform } from '@app/common/service/sort-transform';
+
 
 @Injectable()
 export class CommentsService {
   constructor(@InjectRepository(Comment) private repo: Repository<Comment>) {}
 
-  async create(createCommentDto: CommentDto) {
-    const comment = await this.repo.create(createCommentDto);
-
-    return await this.repo.save(comment);
+  create(createCommentDto: CommentDto): Promise<CommentDto> {
+    const comment = this.repo.create(createCommentDto);
+    return this.repo.save(comment);
   }
 
   //TODO: Change any with proper interface
-  findAll({
-    filter,
-    pagination,
-    sort,
-  }: {
-    filter: CommentFilterDto;
-    pagination: PaginationDto;
-    sort: CommentSortDto[];
-  }): Promise<Comment[]> {
-    console.log(filter,pagination,sort)
-    const { page = 1, maxRows } = pagination || {};
+   async findAll({ filter, pagination, sort }: CommentFindDto){
+    //Pagination Logic
+    const { page, maxRows } = pagination;
     const skip = ((page - 1) * maxRows) | 0;
-    const take = maxRows 
+    const take = maxRows;    
+    let totalNumber = 0;
+    // let totalPage = totalNumber;  
+    // total number of comment count
+    totalNumber =await this.repo.count()    
+    //Find Logic
     const where: any = { ...filter };
-    
     if (where.id && Array.isArray(where.id)) {
       where.id = In(where.id);
     }
-    const order: any = {};
-
-    if (sort && sort.length > 0) {
-      sort.forEach((item) => {
-        order[item.sortBy] = item.order.toUpperCase();
-      });
-    }
-    return this.repo.find({
+    //Sort Logic
+    const order = sortTransform(sort);
+     
+    const comments= await this.repo.find({
       take,
       skip,
       where,
@@ -61,10 +53,12 @@ export class CommentsService {
         },
       },
     });
+   
+    return {data:comments, count: totalNumber}
   }
 
   //TODO: Change any with proper interface
-  async findOne({ filter }: { filter: CommentFilterDto }): Promise<Comment> {
+  async findOne(filter: CommentFilterDto): Promise<Comment> {
     const modifiedFilter: any = { post: filter?.post };
     if (typeof filter.id === 'number') {
       modifiedFilter.id = filter.id;
@@ -86,7 +80,8 @@ export class CommentsService {
   }
 
   async update(id: number, updateCommentDto: UpdateCommentDto) {
-    return await this.repo.update(id, updateCommentDto);
+    await this.repo.update(id, updateCommentDto);
+    return this.findOne({ id: id });
   }
 
   remove(id: number) {

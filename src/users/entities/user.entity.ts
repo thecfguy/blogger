@@ -1,7 +1,10 @@
 import { Todo } from '@app/todos/entities/todo.entity';
-import { Post } from '@app/posts/entities/post.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Posts } from '@app/posts/entities/post.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany ,BeforeInsert, Unique, JoinTable, ManyToMany } from 'typeorm';
 import { Album } from '@app/albums/entities/album.entity';
+import { Role } from '../dto/user.dto';
+import { Group } from '@app/group/entities/group.entity';
+
 
 @Entity({ name: 'users' })
 export class User {
@@ -14,11 +17,14 @@ export class User {
   @Column({ nullable: false })
   password: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, unique:true })
   username: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false,unique:true })
   email: string;
+  
+  @Column({ nullable: false , default: Role.User, name: 'role' })
+  role: Role;
 
   @Column({ nullable: true })
   street: string;
@@ -53,12 +59,29 @@ export class User {
   @Column({ nullable: true, name: 'company_bs' })
   companyBs: string;
 
-  @OneToMany(() => Todo, (todo) => todo.user)
+  @OneToMany(() => Todo, (todo) => todo.user,{cascade:true})
   todos: Todo[];
 
-  @OneToMany(() => Post, (post) => post.user)
-  posts: Post[];
+  @OneToMany(() => Posts, (post) => post.user,{cascade:true})
+  posts: Posts[];
 
-  @OneToMany(() => Album, (album) => album.user)
+  @OneToMany(() => Album, (album) => album.user,{cascade:true})
   albums: Album[];
+
+  @ManyToMany(() => Group, group => group.users)
+  @JoinTable({name:'users_groups_link',joinColumn: {
+     name: 'userId', 
+  },
+  inverseJoinColumn: {
+       name: 'groupId', 
+  },})
+  groups: Group[];
+
+
+  @BeforeInsert()
+  setDefaultRole() {
+    if (!this.role) {
+      this.role = Role.User;
+    }
+  }
 }

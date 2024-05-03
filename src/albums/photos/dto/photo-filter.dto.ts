@@ -1,6 +1,17 @@
+import { Type } from 'class-transformer';
+import { IsNotEmpty, IsNumber, IsOptional, ValidateNested } from 'class-validator';
+
+class albumDto {
+ @IsNotEmpty()
+  @IsNumber()
+  id?: number;
+}
 export class PhotoFilterDto {
-    id?: number | number[];
-    album?: {
-        id?: number;
-    };
+  @IsOptional()
+  id?: number | number[];
+  
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => albumDto)
+  album?: albumDto;
 }
